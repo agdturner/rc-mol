@@ -2,18 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.agdturner</groupId>
-    <artifactId>ccg-v2d</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <artifactId>rc-mol</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     
-    <name>ccg-v2d</name>
-    <url>https://github.com/agdturner/ccg-v2d</url>
-    <description>A Java library for Euclidean 2D spatial vector geometry.</description>
+    <name>rc-mol</name>
+    <url>https://github.com/agdturner/rc-mol</url>
+    <description>A modular Java application for loading, aligning and visualising ribosome data.</description>
     <scm>
-        <url>git@github.com:agdturner/ccg-v2d.git</url>
-        <connection>scm:git:git@github.com:agdturner/ccg-v2d.git</connection>
-        <developerConnection>scm:git:git@github.com:agdturner/ccg-v2d</developerConnection>
-        <tag>ccg-v2d-0.4</tag>
+        <url>git@github.com:agdturner/rc-mol.git</url>
+        <connection>scm:git:git@github.com:agdturner/rc-mol.git</connection>
+        <developerConnection>scm:git:git@github.com:agdturner/rc-mol</developerConnection>
+        <tag>rc-mol-0.1</tag>
     </scm>
     <licenses>
         <license>
@@ -22,16 +22,16 @@
         </license>
     </licenses>
     <organization>
-        <name>Centre for Computational Geography</name>
-        <url>http://www.ccg.leeds.ac.uk/</url>
+        <name>University of Leeds</name>
+        <url>http://www.leeds.ac.uk/</url>
     </organization>
     <developers>
         <developer>
             <id>agdturner</id>
             <name>Andy Turner</name>
             <email>a.g.d.turner@leeds.ac.uk</email>
-            <organization>Centre for Computational Geography, University of Leeds</organization>
-            <organizationUrl>http://www.ccg.leeds.ac.uk/</organizationUrl>
+            <organization>University of Leeds</organization>
+            <organizationUrl>http://www.leeds.ac.uk/</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -67,11 +67,17 @@
             <artifactId>ccg-math</artifactId>
             <version>3.1.0-SNAPSHOT</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.github.agdturner/ccg-stats -->
+        <!-- https://mvnrepository.com/artifact/io.github.agdturner/ccg-r3d -->
         <dependency>
             <groupId>io.github.agdturner</groupId>
-            <artifactId>ccg-stats</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <artifactId>ccg-r3d</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.agdturner/ccg-v3d -->
+        <dependency>
+            <groupId>io.github.agdturner</groupId>
+            <artifactId>ccg-v3d</artifactId>
+            <version>0.20-SNAPSHOT</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/ch.obermuhlner/big-math -->
         <dependency>
