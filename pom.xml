@@ -49,6 +49,12 @@
     </properties>
     
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.rcsb/ciftools-java -->
+        <dependency>
+            <groupId>org.rcsb</groupId>
+            <artifactId>ciftools-java</artifactId>
+            <version>7.0.1</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/io.github.agdturner/ccg-generic -->
         <dependency>
             <groupId>io.github.agdturner</groupId>
