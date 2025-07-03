@@ -15,14 +15,13 @@
  */
 package uk.ac.leeds.ccg.mol.run;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -30,8 +29,10 @@ import org.rcsb.cif.CifBuilder;
 import org.rcsb.cif.CifIO;
 import org.rcsb.cif.model.CifFile;
 import org.rcsb.cif.model.FloatColumn;
+import org.rcsb.cif.model.StrColumn;
 import org.rcsb.cif.schema.StandardSchemata;
 import org.rcsb.cif.schema.mm.AtomSite;
+import org.rcsb.cif.schema.mm.Entry;
 import org.rcsb.cif.schema.mm.MmCifBlock;
 import org.rcsb.cif.schema.mm.MmCifFile;
 import uk.ac.leeds.ccg.generic.io.Generic_IO;
@@ -41,6 +42,11 @@ import uk.ac.leeds.ccg.generic.io.Generic_IO;
  * @author Andy Turner
  */
 public class Example1 {
+
+    /**
+     * The path for IO.
+     */
+    Path dir;
 
     /**
      * Create a new instance.
@@ -56,9 +62,10 @@ public class Example1 {
             boolean parseBinary = true;
             System.out.println("Load " + pdbId + " parseBinary " + Boolean.toString(parseBinary));
             /**
-             * CIF and BinaryCIF are stored in the same data structure to access the
-             * data, it does not matter where and in which format the data came from
-             * all relevant IO operations are exposed by the CifIO class.
+             * CIF and BinaryCIF are stored in the same data structure to access
+             * the data, it does not matter where and in which format the data
+             * came from all relevant IO operations are exposed by the CifIO
+             * class.
              */
             CifFile cifFile;
             if (parseBinary) {
@@ -74,25 +81,22 @@ public class Example1 {
              * supports MMCIF and CIF_CORE.
              */
             MmCifFile mmCifFile = cifFile.as(StandardSchemata.MMCIF);
-            
-            ex.parseFile(mmCifFile);
-    
-            ex.translate(mmCifFile, 100d, 200d, 300d);
-            
-            
-            // the created CifFile instance behaves like a parsed file and can be processed or written as needed
-            Path p = Paths.get("C:", "Users", "geoagdt", "Downloads", "test.cif");
-            Files.createFile(p);
 
-            ex.writeFile(mmCifFile, p);
-            
+            ex.parseFile(mmCifFile);
+
+            ex.translate(mmCifFile, 100d, 200d, 300d);
+
+            // the created CifFile instance behaves like a parsed file and can be processed or written as needed
+            ex.dir = Paths.get("C:", "Users", "geoagdt", "Downloads");
+            Path p = Paths.get(ex.dir.toString(), "testbinary.cif");
+            ex.writeFile(mmCifFile, p, true);
+            p = Paths.get(ex.dir.toString(), "testtext.cif");
+            ex.writeFile(mmCifFile, p, false);
+
             cifFile = CifIO.readFromURL(p.toUri().toURL());
             mmCifFile = cifFile.as(StandardSchemata.MMCIF);
             ex.parseFile(mmCifFile);
-            
-            
-            
-            
+
             //ex.buildModel();
             ex.convertAlphaFold();
         } catch (IOException ioe) {
@@ -101,16 +105,50 @@ public class Example1 {
     }
 
     /**
-     * For downloading and parsing a CIF file.
+     * For parsing a CIF file.
      *
-     * @param pdbId The PDB ID of the file to download.
-     * @param parseBinary This indicates if the file is binary.
-     * @throws IOException
+     * @param mmCifFile The CIF file to parse.
      */
-    public void parseFile(MmCifFile mmCifFile) throws IOException {
-        
-        // get first block of CIF
+    public void parseFile(MmCifFile mmCifFile) {
+
+        // Get first block of CIF
         MmCifBlock data = mmCifFile.getFirstBlock();
+        System.out.println("data_" + data.getBlockHeader());
+        //System.out.println("#");
+        //Entry entry = data.getEntry();
+        //System.out.print("_" + entry.getCategoryName());
+        //StrColumn sc = entry.getId();
+        //System.out.print("." + sc.getColumnName());
+        //String entryId = sc.get(0);
+        //System.out.println("\t" + entryId);
+        data.categories().forEach(
+            cat -> {
+                //int rowCount = cat.getRowCount();
+                //System.out.println("rowCount " + rowCount);
+                
+                System.out.println("#");
+                String catName = cat.getCategoryName();
+                List<String> colNames = cat.getColumnNames();
+                int ncols = colNames.size();
+                System.out.println("ncols " + ncols);
+                cat.columns().forEach(
+                    col -> {
+                        int nrows = col.getRowCount();
+                        System.out.println("nrows " + nrows);
+                        if (nrows == 1) {
+                            System.out.println("_" + catName + "." + col.getColumnName() + "\t" + col.getStringData(0));
+                        } else {
+                            System.out.println("_" + catName + "." + col.getColumnName());
+                            col.stringData().forEach(
+                                sd -> {
+                                    System.out.print(sd + " ");                      
+                                }
+                            );
+                        }
+                    }
+                );
+            }
+        );
 
         // get category with name '_atom_site' from first block - access is type-safe, all categories
         // are inferred from the CIF schema
@@ -118,11 +156,6 @@ public class Example1 {
         FloatColumn cartnX = atomSite.getCartnX();
         FloatColumn cartnY = atomSite.getCartnY();
         FloatColumn cartnZ = atomSite.getCartnZ();
-
-        // obtain entry id
-        String entryId = data.getEntry().getId().get(0);
-        System.out.print("entryId ");
-        System.out.println(entryId);
 
         // calculate the average x-coordinate
         OptionalDouble averageCartnX = cartnX.values().average();
@@ -148,22 +181,33 @@ public class Example1 {
         Optional<String> groupPdb = data.getAtomSite().getGroupPDB().values().findFirst();
         System.out.print("groupPdb ");
         groupPdb.ifPresent(System.out::println);
-        
     }
 
     /**
-     * 
-     * @param mmCifFile
-     * @param p
-     * @throws IOException 
+     * For writing CIF format data to file.
+     *
+     * @param mmCifFile The data to write.
+     * @param p The path of the file to be written.
+     * @param binary If true then mmCifFile is written in an CIF binary format
+     * otherwise it is written in the CIF text format.
+     * @throws IOException
      */
-    public void writeFile(MmCifFile mmCifFile, Path p) throws IOException{    
-        BufferedOutputStream bos = Generic_IO.getBufferedOutputStream(p);
-        bos.write(CifIO.writeBinary(mmCifFile));
-        bos.close();
+    public void writeFile(MmCifFile mmCifFile, Path p, boolean binary) throws IOException {
+        if (!Files.exists(p)) {
+            Files.createFile(p);
+        }
+        try (var bos = Generic_IO.getBufferedOutputStream(p)) {
+            if (binary) {
+                bos.write(CifIO.writeBinary(mmCifFile));
+            } else {
+                byte[] bs = CifIO.writeText(mmCifFile);
+                //System.out.println(new String(bs)));
+                bos.write(bs);
+            }
+        }
     }
-    
-    public void translate(MmCifFile mmCifFile, double dx, double dy, double dz) throws IOException{
+
+    public void translate(MmCifFile mmCifFile, double dx, double dy, double dz) throws IOException {
         MmCifBlock data = mmCifFile.getFirstBlock();
         String blockHeader = data.getBlockHeader();
         AtomSite atomSite = data.getAtomSite();
@@ -174,7 +218,7 @@ public class Example1 {
         while (ite.hasNext()) {
             double x = ite.next();
             xs[i] = x + dx;
-            i ++;
+            i++;
         }
         i = 0;
         FloatColumn cartnY = atomSite.getCartnY();
@@ -183,7 +227,7 @@ public class Example1 {
         while (ite.hasNext()) {
             double y = ite.next();
             ys[i] = y + dy;
-            i ++;
+            i++;
         }
         i = 0;
         FloatColumn cartnZ = atomSite.getCartnZ();
@@ -192,7 +236,7 @@ public class Example1 {
         while (ite.hasNext()) {
             double z = ite.next();
             zs[i] = z + dz;
-            i ++;
+            i++;
         }
         MmCifFile outCifFile = CifBuilder.enterFile(StandardSchemata.MMCIF)
                 // create a block
@@ -207,39 +251,29 @@ public class Example1 {
                 .leaveColumn()
                 // and category
                 .leaveCategory()
-
                 // create atom site category
                 .enterAtomSite()
                 // and specify some x-coordinates
                 .enterCartnX()
                 .add(xs)
                 .leaveColumn()
-
                 .enterCartnY()
                 .add(ys)
                 .leaveColumn()
-
                 .enterCartnZ()
                 .add(zs)
                 .leaveColumn()
-
                 // leaving the builder will release the CifFile instance
                 .leaveCategory()
                 .leaveBlock()
                 .leaveFile();
-                
-        // the created CifFile instance behaves like a parsed file and can be processed or written as needed
+
         Path p = Paths.get("C:", "Users", "geoagdt", "Downloads", "translated.cif");
-        Files.createFile(p);
-        
-        BufferedOutputStream bos = Generic_IO.getBufferedOutputStream(p);
-        bos.write(CifIO.writeText(outCifFile));
-        bos.close();
-        
+        writeFile(outCifFile, p, false);
         MmCifFile mmCifFile2 = outCifFile.as(StandardSchemata.MMCIF);
         parseFile(mmCifFile2);
     }
-    
+
     public void buildModel() throws IOException {
         // all builder functionality is exposed by the CifBuilder class
         // again access can be generic or following a given schema
@@ -256,7 +290,6 @@ public class Example1 {
                 .leaveColumn()
                 // and category
                 .leaveCategory()
-
                 // create atom site category
                 .enterAtomSite()
                 // and specify some x-coordinates
@@ -266,28 +299,20 @@ public class Example1 {
                 .markNextUnknown()
                 .add(-3.14, 5.0)
                 .leaveColumn()
-
                 // after leaving, the builder is in AtomSite again and provides column names
                 .enterCartnY()
                 .add(0.0, -1.0, 2.72)
                 .markNextNotPresent()
                 .add(42, 100)
                 .leaveColumn()
-
                 // leaving the builder will release the CifFile instance
                 .leaveCategory()
                 .leaveBlock()
                 .leaveFile();
 
         // the created CifFile instance behaves like a parsed file and can be processed or written as needed
-        Path p = Paths.get("C:", "Users", "geoagdt", "Downloads", "test.cif");
-        Files.createFile(p);
-        
-        BufferedOutputStream bos = Generic_IO.getBufferedOutputStream(p);
-        bos.write(CifIO.writeText(cifFile));
-        bos.close();
-        //System.out.println(new String(CifIO.writeText(cifFile)));
-        
+        Path p = Paths.get(dir.toString(), "test.cif");
+        writeFile(cifFile, p, false);
 
         System.out.println(cifFile.getFirstBlock().getEntry().getId().get(0));
         cifFile.getFirstBlock()
@@ -296,7 +321,7 @@ public class Example1 {
                 .values()
                 .forEach(System.out::println);
     }
-    
+
     public void convertAlphaFold() throws IOException {
         String id = "AF-Q76EI6-F1-model_v4";
 
@@ -313,9 +338,8 @@ public class Example1 {
 
         //System.out.println(mmCifFile.toString());
         //System.out.println(mmCifFile.toString());
-        
         // convert to BinaryCIF representation
         byte[] output = CifIO.writeBinary(mmCifFile);
     }
-    
+
 }
