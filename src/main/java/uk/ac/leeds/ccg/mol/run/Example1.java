@@ -28,8 +28,10 @@ import java.util.OptionalInt;
 import org.rcsb.cif.CifBuilder;
 import org.rcsb.cif.CifIO;
 import org.rcsb.cif.model.CifFile;
+import org.rcsb.cif.model.Column;
 import org.rcsb.cif.model.FloatColumn;
 import org.rcsb.cif.model.StrColumn;
+import org.rcsb.cif.model.ValueKind;
 import org.rcsb.cif.schema.StandardSchemata;
 import org.rcsb.cif.schema.mm.AtomSite;
 import org.rcsb.cif.schema.mm.Entry;
@@ -82,7 +84,7 @@ public class Example1 {
              */
             MmCifFile mmCifFile = cifFile.as(StandardSchemata.MMCIF);
 
-            ex.parseFile(mmCifFile);
+            StringBuilder sb = ex.parseFile(mmCifFile);
 
             ex.translate(mmCifFile, 100d, 200d, 300d);
 
@@ -109,11 +111,14 @@ public class Example1 {
      *
      * @param mmCifFile The CIF file to parse.
      */
-    public void parseFile(MmCifFile mmCifFile) {
+    public StringBuilder parseFile(MmCifFile mmCifFile) {
 
+        StringBuilder sb = new StringBuilder();
         // Get first block of CIF
         MmCifBlock data = mmCifFile.getFirstBlock();
-        System.out.println("data_" + data.getBlockHeader());
+        String str = "data_" + data.getBlockHeader();
+        System.out.println(str);
+        sb.append(str + "\n");
         //System.out.println("#");
         //Entry entry = data.getEntry();
         //System.out.print("_" + entry.getCategoryName());
@@ -122,32 +127,42 @@ public class Example1 {
         //String entryId = sc.get(0);
         //System.out.println("\t" + entryId);
         data.categories().forEach(
-            cat -> {
-                //int rowCount = cat.getRowCount();
-                //System.out.println("rowCount " + rowCount);
-                
-                System.out.println("#");
-                String catName = cat.getCategoryName();
-                List<String> colNames = cat.getColumnNames();
-                int ncols = colNames.size();
-                System.out.println("ncols " + ncols);
-                cat.columns().forEach(
-                    col -> {
-                        int nrows = col.getRowCount();
-                        System.out.println("nrows " + nrows);
-                        if (nrows == 1) {
-                            System.out.println("_" + catName + "." + col.getColumnName() + "\t" + col.getStringData(0));
-                        } else {
-                            System.out.println("_" + catName + "." + col.getColumnName());
-                            col.stringData().forEach(
-                                sd -> {
-                                    System.out.print(sd + " ");                      
+                cat -> {
+                    //int rowCount = cat.getRowCount();
+                    //System.out.println("rowCount " + rowCount);
+                    addString(sb, "#");
+                    String catName = cat.getCategoryName();
+                    //System.out.println(catName);
+                    List<String> colNames = cat.getColumnNames();
+                    int ncols = colNames.size();
+                    //System.out.println("ncols " + ncols);
+                    int nrows = cat.getRowCount();
+                    //System.out.println("nrows " + nrows);
+                    if (nrows > 1) {
+                        addString(sb, "loop_");
+                    }
+                    StringBuilder[] rows = new StringBuilder[nrows];
+                    for (int i = 0; i < nrows; i++) {
+                        rows[i] = new StringBuilder();
+                    }
+                    cat.columns().forEach(
+                            col -> {
+                                if (nrows == 1) {
+                                    addString(sb, "_" + catName + "." + col.getColumnName() + "\t" + format(col, 0));
+                                } else {
+                                    addString(sb, "_" + catName + "." + col.getColumnName());
+                                    for (int i = 0; i < nrows; i++) {
+                                        rows[i].append(format(col, i) + " ");
+                                    }
                                 }
-                            );
+                            }
+                    );
+                    if (nrows > 1) {
+                        for (int i = 0; i < nrows; i++) {
+                            addString(sb, rows[i].substring(0, rows[i].length()));
                         }
                     }
-                );
-            }
+                }
         );
 
         // get category with name '_atom_site' from first block - access is type-safe, all categories
@@ -181,6 +196,31 @@ public class Example1 {
         Optional<String> groupPdb = data.getAtomSite().getGroupPDB().values().findFirst();
         System.out.print("groupPdb ");
         groupPdb.ifPresent(System.out::println);
+        return sb;
+    }
+
+    public void addString(StringBuilder sb, String s) {
+        System.out.println(s);
+        sb.append(s + "\n");
+    }
+    
+    /**
+     * @param col The column to parse.
+     * @param i The row index to parse.
+     * @return A String.
+     */
+    public String format(Column<?> col, int i) {
+        String s = col.getStringData(i);
+        ValueKind vk = col.getValueKind(i);
+        if (vk == ValueKind.NOT_PRESENT) {
+            s = ".";
+        } else if (vk == ValueKind.UNKNOWN) {
+            s = "?";
+        }
+        if (s.contains(" ")) {
+            s = "'" + s + "'";
+        }
+        return s;
     }
 
     /**
