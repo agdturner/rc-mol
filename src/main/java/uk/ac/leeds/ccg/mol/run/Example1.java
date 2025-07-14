@@ -15,16 +15,21 @@
  */
 package uk.ac.leeds.ccg.mol.run;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.rcsb.cif.CifBuilder;
 import org.rcsb.cif.CifIO;
 import org.rcsb.cif.model.CifFile;
@@ -38,6 +43,8 @@ import org.rcsb.cif.schema.mm.Entry;
 import org.rcsb.cif.schema.mm.MmCifBlock;
 import org.rcsb.cif.schema.mm.MmCifFile;
 import uk.ac.leeds.ccg.generic.io.Generic_IO;
+import uk.ac.leeds.ccg.math.arithmetic.Math_BigDecimal;
+import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
 
 /**
  *
@@ -45,6 +52,12 @@ import uk.ac.leeds.ccg.generic.io.Generic_IO;
  */
 public class Example1 {
 
+    public static int LINE_CHAR_LENGTH_MAX = 2048;
+
+    public static int NAME_CODE_LENGTH_MAX = 75;
+
+    public static int HEADER_LENGTH_MAX = 80;
+    
     /**
      * The path for IO.
      */
@@ -84,23 +97,28 @@ public class Example1 {
              */
             MmCifFile mmCifFile = cifFile.as(StandardSchemata.MMCIF);
 
-            StringBuilder sb = ex.parseFile(mmCifFile);
+            ArrayList<String> lines = ex.parseFile(mmCifFile);
+            
+            
 
-            ex.translate(mmCifFile, 100d, 200d, 300d);
+            //ex.translate(mmCifFile, 100d, 200d, 300d);
 
             // the created CifFile instance behaves like a parsed file and can be processed or written as needed
             ex.dir = Paths.get("C:", "Users", "geoagdt", "Downloads");
-            Path p = Paths.get(ex.dir.toString(), "testbinary.cif");
-            ex.writeFile(mmCifFile, p, true);
-            p = Paths.get(ex.dir.toString(), "testtext.cif");
-            ex.writeFile(mmCifFile, p, false);
-
+          Path p = Paths.get(ex.dir.toString(), "testbinary.cif");
+//          ex.writeFile(mmCifFile, p, true);
+            //p = Paths.get(ex.dir.toString(), "testtext.cif");
+            p = Paths.get(ex.dir.toString(), "testtextsb.cif");
+          //ex.writeFile(mmCifFile, p, false);
+            
+           ex.writeFile(lines, p);
+//
             cifFile = CifIO.readFromURL(p.toUri().toURL());
             mmCifFile = cifFile.as(StandardSchemata.MMCIF);
             ex.parseFile(mmCifFile);
-
-            //ex.buildModel();
-            ex.convertAlphaFold();
+//
+//            //ex.buildModel();
+//            ex.convertAlphaFold();
         } catch (IOException ioe) {
             System.err.println(ioe.getMessage());
         }
@@ -110,15 +128,16 @@ public class Example1 {
      * For parsing a CIF file.
      *
      * @param mmCifFile The CIF file to parse.
+     * @return The lines.
      */
-    public StringBuilder parseFile(MmCifFile mmCifFile) {
+    public ArrayList<String> parseFile(MmCifFile mmCifFile) {
 
-        StringBuilder sb = new StringBuilder();
+        ArrayList<String> lines = new ArrayList<>();
+  //      StringBuilder sb = new StringBuilder();
         // Get first block of CIF
         MmCifBlock data = mmCifFile.getFirstBlock();
         String str = "data_" + data.getBlockHeader();
-        System.out.println(str);
-        sb.append(str + "\n");
+        addLine(lines, str);
         //System.out.println("#");
         //Entry entry = data.getEntry();
         //System.out.print("_" + entry.getCategoryName());
@@ -126,44 +145,46 @@ public class Example1 {
         //System.out.print("." + sc.getColumnName());
         //String entryId = sc.get(0);
         //System.out.println("\t" + entryId);
-        data.categories().forEach(
-                cat -> {
-                    //int rowCount = cat.getRowCount();
-                    //System.out.println("rowCount " + rowCount);
-                    addString(sb, "#");
-                    String catName = cat.getCategoryName();
-                    //System.out.println(catName);
-                    List<String> colNames = cat.getColumnNames();
-                    int ncols = colNames.size();
-                    //System.out.println("ncols " + ncols);
-                    int nrows = cat.getRowCount();
-                    //System.out.println("nrows " + nrows);
-                    if (nrows > 1) {
-                        addString(sb, "loop_");
-                    }
-                    StringBuilder[] rows = new StringBuilder[nrows];
-                    for (int i = 0; i < nrows; i++) {
-                        rows[i] = new StringBuilder();
-                    }
-                    cat.columns().forEach(
-                            col -> {
-                                if (nrows == 1) {
-                                    addString(sb, "_" + catName + "." + col.getColumnName() + "\t" + format(col, 0));
-                                } else {
-                                    addString(sb, "_" + catName + "." + col.getColumnName());
-                                    for (int i = 0; i < nrows; i++) {
-                                        rows[i].append(format(col, i) + " ");
-                                    }
-                                }
-                            }
-                    );
-                    if (nrows > 1) {
-                        for (int i = 0; i < nrows; i++) {
-                            addString(sb, rows[i].substring(0, rows[i].length()));
+        data.categories().forEach(cat -> {
+            //int rowCount = cat.getRowCount();
+            //System.out.println("rowCount " + rowCount);
+            addLine(lines, "#");
+            String catName = cat.getCategoryName();
+            //System.out.println(catName);
+            List<String> colNames = cat.getColumnNames();
+            int ncols = colNames.size();
+            //System.out.println("ncols " + ncols);
+            int catNrows = cat.getRowCount();
+            //System.out.println("nrows " + nrows);
+            if (catNrows > 1) {
+                addLine(lines, "loop_");
+            }
+            StringBuilder[] rows = new StringBuilder[catNrows];
+            for (int i = 0; i < catNrows; i++) {
+                rows[i] = new StringBuilder();
+            }
+            cat.columns().forEach(col -> {
+                int colNrows = col.getRowCount();
+                if (colNrows == 1) {
+                    addLine(lines, "_" + catName + "." + col.getColumnName() + "\t" + format(col, 0));
+                } else {
+                    addLine(lines, "_" + catName + "." + col.getColumnName());
+                    for (int i = 0; i < colNrows; i++) {
+                        try {
+                            rows[i].append(format(col, i)).append(" ");
+                        } catch(java.lang.ArrayIndexOutOfBoundsException e) {
+                            System.err.println(e.getMessage());                            
                         }
                     }
                 }
-        );
+            });
+            if (catNrows > 1) {
+                for (int i = 0; i < catNrows; i++) {
+                    // This is where coordinates could be changed...
+                    addLine(lines, rows[i].substring(0, rows[i].length()));
+                }
+            }
+        });
 
         // get category with name '_atom_site' from first block - access is type-safe, all categories
         // are inferred from the CIF schema
@@ -178,10 +199,29 @@ public class Example1 {
         averageCartnX.ifPresent(System.out::println);
 
         // calculate the average y-coordinate
+        try {
         OptionalDouble averageCartnY = cartnY.values().average();
         System.out.print("averageCartnY ");
         averageCartnY.ifPresent(System.out::println);
-
+        } catch (java.lang.NumberFormatException e) {
+            System.out.println("cartnY.values().count " + cartnY.values().count());
+            System.err.println(e.getMessage());
+            cartnY.values().forEach(x -> {
+                if (!Double.isFinite(x)) {
+                    if (Double.isNaN(x)) {
+                        System.out.println("NaN");
+                    } else {
+                        System.out.println("Infinity");
+                    }                    
+                }
+                try {
+                    Double.toString(x);
+                } catch (java.lang.NumberFormatException e2) {
+                    int debug = 1;
+                }
+            });
+            
+        }
         // calculate the average z-coordinate
         OptionalDouble averageCartnZ = cartnZ.values().average();
         System.out.print("averageCartnZ ");
@@ -196,20 +236,29 @@ public class Example1 {
         Optional<String> groupPdb = data.getAtomSite().getGroupPDB().values().findFirst();
         System.out.print("groupPdb ");
         groupPdb.ifPresent(System.out::println);
-        return sb;
+        return lines;
     }
 
-    public void addString(StringBuilder sb, String s) {
+    public void addLine(ArrayList<String> lines, String s) {
         System.out.println(s);
-        sb.append(s + "\n");
+        if (s.equalsIgnoreCase("_atom_site.Cartn_x")) {
+            int debug = 1;
+        }
+        lines.add(s.trim());
     }
-    
+
     /**
      * @param col The column to parse.
      * @param i The row index to parse.
      * @return A String.
      */
     public String format(Column<?> col, int i) {
+        
+//        // Debug code
+//        if (col.getRowCount() < i + 1) {
+//            int debug = 1;
+//        }
+        
         String s = col.getStringData(i);
         ValueKind vk = col.getValueKind(i);
         if (vk == ValueKind.NOT_PRESENT) {
@@ -217,9 +266,23 @@ public class Example1 {
         } else if (vk == ValueKind.UNKNOWN) {
             s = "?";
         }
-        if (s.contains(" ")) {
-            s = "'" + s + "'";
+        if (s.contains("'")) {
+            s = "\"" + s + "\"";
+        } else {
+            if (s.contains(" ") || s.startsWith("_")) {
+                s = "'" + s + "'";
+            }
         }
+        if (Math_Double.isDouble(s)) {
+            //int debug = 1;
+            s = Math_BigDecimal.round(new BigDecimal(s), -3).toPlainString();
+        }
+//        if (s.length() > 60) {
+//            if (!s.contains(" ") && !s.contains(",")) {
+//                int debug = 1;
+//                s = "\n" + ";" + s.trim() + "\n" + ";" + "\n";
+//            }
+//        }
         return s;
     }
 
@@ -244,10 +307,182 @@ public class Example1 {
                 //System.out.println(new String(bs)));
                 bos.write(bs);
             }
+            bos.flush();
+        }
+    }
+    
+    /**
+     * For writing CIF format data to file.
+     *
+     * @param lines The lines to write.
+     * @param p The path of the file to be written.
+     * @throws IOException
+     */
+    public void writeFile(ArrayList<String> lines, Path p) throws IOException {
+        if (!Files.exists(p)) {
+            Files.createFile(p);
+        }
+        try (var bos = Generic_IO.getBufferedOutputStream(p)) {
+            lines.forEach(l -> {
+                try {
+                    write(l, bos);
+                } catch (IOException ex) {
+                    Logger.getLogger(Example1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });            
+            bos.flush();
+        }
+    }
+    
+    /**
+     * Write out a string splitting it across multiple lines and adding a 
+     * semicolon if necessary according to the CIF file specification which is 
+     * based on a STAR format restricting lines to 80 characters.
+     * @param s The string to write.
+     * @param bos The BufferedOutputStream to write to.
+     * @throws IOException if encountered.
+     */
+    public void write(String s, BufferedOutputStream bos) throws IOException {
+        if (s.length() > LINE_CHAR_LENGTH_MAX) {
+            bos.write((s.substring(0, LINE_CHAR_LENGTH_MAX) + "\n;").getBytes());
+            write(s.substring(LINE_CHAR_LENGTH_MAX), bos);
+        } else {
+            bos.write((s + "\n").getBytes());
         }
     }
 
+    /**
+     * For translating.
+     *
+     * @param mmCifFile The CIF file to parse.
+     */
+    public void translate2(MmCifFile mmCifFile, double dx, double dy, double dz) throws IOException {
+    
+        ArrayList<String> lines = new ArrayList<String>();
+        // Get first block of CIF
+        MmCifBlock data = mmCifFile.getFirstBlock();
+        String str = "data_" + data.getBlockHeader();
+        addLine(lines, str);
+        //System.out.println("#");
+        //Entry entry = data.getEntry();
+        //System.out.print("_" + entry.getCategoryName());
+        //StrColumn sc = entry.getId();
+        //System.out.print("." + sc.getColumnName());
+        //String entryId = sc.get(0);
+        //System.out.println("\t" + entryId);
+        data.categories().forEach(cat -> {
+            //int rowCount = cat.getRowCount();
+            //System.out.println("rowCount " + rowCount);
+            addLine(lines, "#");
+            String catName = cat.getCategoryName();
+            //System.out.println(catName);
+            List<String> colNames = cat.getColumnNames();
+            int ncols = colNames.size();
+            //System.out.println("ncols " + ncols);
+            int nrows = cat.getRowCount();
+            //System.out.println("nrows " + nrows);
+            if (nrows > 1) {
+                addLine(lines, "loop_");
+            }
+            StringBuilder[] rows = new StringBuilder[nrows];
+            for (int i = 0; i < nrows; i++) {
+                rows[i] = new StringBuilder();
+            }
+            cat.columns().forEach(col -> {
+                if (nrows == 1) {
+                    addLine(lines, "_" + catName + "." + col.getColumnName() + "\t" + format(col, 0));
+                } else {
+                    addLine(lines, "_" + catName + "." + col.getColumnName());
+                    for (int i = 0; i < nrows; i++) {
+                        rows[i].append(format(col, i) + " ");
+                    }
+                }
+            });
+            if (nrows > 1) {
+                for (int i = 0; i < nrows; i++) {
+                    addLine(lines, rows[i].substring(0, rows[i].length()));
+                }
+            }
+        });
+        
+        
+        String blockHeader = data.getBlockHeader();
+        AtomSite atomSite = data.getAtomSite();
+        FloatColumn cartnX = atomSite.getCartnX();
+        double[] xs = new double[(int) cartnX.values().count()];
+        int i = 0;
+        Iterator<Double> ite = cartnX.values().iterator();
+        while (ite.hasNext()) {
+            double x = ite.next();
+            xs[i] = x + dx;
+            i++;
+        }
+        i = 0;
+        FloatColumn cartnY = atomSite.getCartnY();
+        double[] ys = new double[(int) cartnY.values().count()];
+        ite = cartnY.values().iterator();
+        while (ite.hasNext()) {
+            double y = ite.next();
+            ys[i] = y + dy;
+            i++;
+        }
+        i = 0;
+        FloatColumn cartnZ = atomSite.getCartnZ();
+        double[] zs = new double[(int) cartnZ.values().count()];
+        ite = cartnZ.values().iterator();
+        while (ite.hasNext()) {
+            double z = ite.next();
+            zs[i] = z + dz;
+            i++;
+        }
+        MmCifFile outCifFile = CifBuilder.enterFile(StandardSchemata.MMCIF)
+                // create a block
+                .enterBlock(blockHeader)
+                // create a category with name 'entry'
+                .enterEntry()
+                // set value of column 'id'
+                .enterId()
+                // to '1EXP'
+                .add("1EXP")
+                // leave current column
+                .leaveColumn()
+                // and category
+                .leaveCategory()
+                // create atom site category
+                .enterAtomSite()
+                // and specify some x-coordinates
+                .enterCartnX()
+                .add(xs)
+                .leaveColumn()
+                .enterCartnY()
+                .add(ys)
+                .leaveColumn()
+                .enterCartnZ()
+                .add(zs)
+                .leaveColumn()
+                // leaving the builder will release the CifFile instance
+                .leaveCategory()
+                .leaveBlock()
+                .leaveFile();
+
+        Path p = Paths.get("C:", "Users", "geoagdt", "Downloads", "translated.cif");
+        writeFile(outCifFile, p, false);
+        MmCifFile mmCifFile2 = outCifFile.as(StandardSchemata.MMCIF);
+        parseFile(mmCifFile2);
+    }
+    
+    
+    /**
+     * For translating.
+     *
+     * @param mmCifFile The CIF file to parse.
+     * @param dx
+     * @param dy
+     * @param dz
+     * @throws java.io.IOException
+     */
     public void translate(MmCifFile mmCifFile, double dx, double dy, double dz) throws IOException {
+        // Get first block of CIF
         MmCifBlock data = mmCifFile.getFirstBlock();
         String blockHeader = data.getBlockHeader();
         AtomSite atomSite = data.getAtomSite();
