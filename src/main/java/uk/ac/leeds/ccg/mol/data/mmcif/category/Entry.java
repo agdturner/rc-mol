@@ -18,7 +18,7 @@ package uk.ac.leeds.ccg.mol.data.mmcif.category;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Class Entry.
+ * Entry Category.
  * @author Andy Turner
  */
 public class Entry extends Category {

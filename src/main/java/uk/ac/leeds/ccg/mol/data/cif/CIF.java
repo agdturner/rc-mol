@@ -1,5 +1,3 @@
-package uk.ac.leeds.ccg.mol.data.cif;
-
 /*
  * Copyright 2025 University of Leeds.
  *
@@ -15,6 +13,8 @@ package uk.ac.leeds.ccg.mol.data.cif;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.ac.leeds.ccg.mol.data.cif;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
@@ -29,14 +29,14 @@ public class CIF extends Mol_Object {
     private static final long serialVersionUID = 1L;
     
     /**
-     * A look up from a name to the key.
+     * A look up from a name to the Variable_ID.
      */
-    public HashMap<String, Integer> name2key;
+    public HashMap<String, Variable_ID> name2id;
 
     /**
-     * A look up from a key to a name.
+     * A look up from a Variable_ID to a name.
      */
-    public HashMap<Integer, String> key2name;
+    public HashMap<Variable_ID, String> id2name;
     
     /**
      * Comments
@@ -53,8 +53,8 @@ public class CIF extends Mol_Object {
      */
     public CIF(Mol_Environment env){
         super(env);
-        this.name2key = new HashMap<>();
-        this.key2name = new HashMap<>();
+        this.name2id = new HashMap<>();
+        this.id2name = new HashMap<>();
         this.comments = new ArrayList<>();
         this.dataBlocks = new ArrayList<>();
     }

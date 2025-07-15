@@ -35,7 +35,7 @@ public class SaveFrame extends Mol_Object {
     /**
      * The DataItems
      */
-    public HashMap<DataItem_ID, DataItem> dis;
+    public HashMap<Variable_ID, DataItem> dis;
 
     /**
      * Create a new instance.
@@ -44,7 +44,7 @@ public class SaveFrame extends Mol_Object {
      * @param dis What {@link #dis} is set to.
      */
     public SaveFrame(Mol_Environment env, SaveFrameHeading sfh, 
-            HashMap<DataItem_ID, DataItem> dis) {
+            HashMap<Variable_ID, DataItem> dis) {
         super(env);
         this.sfh = sfh;
         this.dis = dis;

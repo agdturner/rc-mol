@@ -1,8 +1,3 @@
-package uk.ac.leeds.ccg.mol.data.cif;
-
-import java.util.ArrayList;
-import uk.ac.leeds.ccg.mol.core.Mol_Strings;
-
 /*
  * Copyright 2025 University of Leeds.
  *
@@ -18,34 +13,41 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.ac.leeds.ccg.mol.data.cif;
+
+import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
 /**
  * Column class.
  * @author Andy Turner
  */
-public class Column extends Variable {
+public class Variable {
     
     /**
-     * The values. 
+     * The category.
      */
-    public ArrayList<String> values;
+    public final Category category;
+    
+    /**
+     * The name.
+     */
+    public final String name;
     
     /**
      * Create a new instance.
      * @param category What {@link #category} is set to.
      * @param name What {@link #name} is set to.
      */
-    public Column(Category category, String name) {
-        super(category, name);
-        this.values = new ArrayList<>();
+    public Variable(Category category, String name) {
+        this.category = category;
+        this.name = name;
     }
     
     /**
-     * Add a value to {@link #values}.
-     * @param value The value to add.
+     * @return The mmCIF token.
      */
-    public void addValue(String value) {
-        values.add(value);
+    public String getToken() {
+        return Mol_Strings.symbol_underscore + category.name 
+                + Mol_Strings.symbol_dot + name;
     }
-    
 }

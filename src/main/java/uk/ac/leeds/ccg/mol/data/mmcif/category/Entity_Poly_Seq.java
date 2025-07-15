@@ -1,8 +1,3 @@
-package uk.ac.leeds.ccg.mol.data.cif;
-
-import java.util.ArrayList;
-import uk.ac.leeds.ccg.mol.core.Mol_Strings;
-
 /*
  * Copyright 2025 University of Leeds.
  *
@@ -18,34 +13,26 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
+
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Column class.
+ * Entity_Poly_Seq Category.
  * @author Andy Turner
  */
-public class Column extends Variable {
+public class Entity_Poly_Seq extends Category {
     
     /**
-     * The values. 
+     * "entity_poly_seq"
      */
-    public ArrayList<String> values;
+    public static String s_entity_poly_seq = "entity_poly_seq";
     
     /**
      * Create a new instance.
-     * @param category What {@link #category} is set to.
-     * @param name What {@link #name} is set to.
      */
-    public Column(Category category, String name) {
-        super(category, name);
-        this.values = new ArrayList<>();
-    }
-    
-    /**
-     * Add a value to {@link #values}.
-     * @param value The value to add.
-     */
-    public void addValue(String value) {
-        values.add(value);
+    public Entity_Poly_Seq() {
+        super(s_entity_poly_seq);
     }
     
 }

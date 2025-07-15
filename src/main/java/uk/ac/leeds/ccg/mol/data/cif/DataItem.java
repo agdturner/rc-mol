@@ -15,41 +15,26 @@
  */
 package uk.ac.leeds.ccg.mol.data.cif;
 
-import uk.ac.leeds.ccg.mol.core.Mol_Strings;
-
 /**
  *
  * @author Andy Turner
  */
-public class DataItem {
-    
-    /**
-     * The category.
-     */
-    private final Category category;
-    
-    /**
-     * The name.
-     */
-    private final String name;
+public class DataItem extends Variable {
     
     /**
      * The value. 
      */
-    private String value;
-    
-    public DataItem(Category category, String name, String value) {
-        this.category = category;
-        this.name = name;
-        this.value = value;
-    }
+    public String value;
     
     /**
-     * @return The mmCIF token.
+     * Create a new instance.
+     * @param category What {@link #category} is set to.
+     * @param name What {@link #name} is set to.
+     * @param value What {@link #value} is set to.
      */
-    public String getToken() {
-        return Mol_Strings.symbol_underscore + category.name 
-                + Mol_Strings.symbol_dot + name;
+    public DataItem(Category category, String name, String value) {
+        super(category, name);
+        this.value = value;
     }
     
 }

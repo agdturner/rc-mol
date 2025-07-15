@@ -18,13 +18,13 @@ package uk.ac.leeds.ccg.mol.data.mmcif.category;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Class Entry.
+ * Database_2 Category.
  * @author Andy Turner
  */
 public class Database_2 extends Category {
     
     /**
-     * "entry"
+     * "s_database_2"
      */
     public static String s_database_2 = "database_2";
     

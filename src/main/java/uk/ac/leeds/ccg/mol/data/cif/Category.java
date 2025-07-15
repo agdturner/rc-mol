@@ -30,9 +30,9 @@ public class Category {
     public final String name;
 
     /**
-     * The DataItems
+     * The Variables
      */
-    public HashMap<DataItem_ID, DataItem> dis;
+    public HashMap<Variable_ID, Variable> variables;
     
     /**
      * Create a new instance.
@@ -47,30 +47,30 @@ public class Category {
      * Create a new instance.
      * 
      * @param name What {@link name} is set to.
-     * @param dis What {@link dis} is set to.
+     * @param variables What {@link #variables} is set to.
      */
-    public Category(String name, HashMap<DataItem_ID, DataItem> dis){
+    public Category(String name, HashMap<Variable_ID, Variable> variables){
         this.name = name;
-        this.dis = dis;
+        this.variables = variables;
     }
     
     /**
-     * Adds or replaces the DataItem with the DataItem ID.
-     * @param id The DataItem ID.
-     * @param di The DataItem
-     * @return The existing data item or null.
+     * Adds or replaces the Variable with the Variable ID.
+     * @param id The Variable ID.
+     * @param v The Variable.
+     * @return The existing Variable or null.
      */
-    public DataItem setDataItem(DataItem_ID id, DataItem di) {
-        DataItem r = dis.get(id);
-        dis.put(id, di);
+    public Variable setVariable(Variable_ID id, Variable v) {
+        Variable r = variables.get(id);
+        variables.put(id, v);
         return r;
     }
     
     /**
-     * @return The maximum token length for all DataItems in {@link #dis}. 
+     * @return The maximum token length for all DataItems in {@link #variables}. 
      */
     public int getTokenMaxLength() {
-        OptionalInt o = dis.values().stream().map(DataItem::getToken)
+        OptionalInt o = variables.values().stream().map(Variable::getToken)
                             .mapToInt(String::length)
                             .max();
         return o.orElse(-1); // Return value held by o, or -1 if there is no value.
