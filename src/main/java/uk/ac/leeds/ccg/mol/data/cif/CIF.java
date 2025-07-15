@@ -21,7 +21,7 @@ import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Object;
 
 /**
- *
+ * CIF class.
  * @author Andy Turner
  */
 public class CIF extends Mol_Object {
@@ -31,28 +31,29 @@ public class CIF extends Mol_Object {
     /**
      * A look up from a name to the key.
      */
-    HashMap<String, Integer> name2key;
+    public HashMap<String, Integer> name2key;
 
     /**
      * A look up from a key to a name.
      */
-    HashMap<Integer, String> key2name;
+    public HashMap<Integer, String> key2name;
     
     /**
      * Comments
      */
-    ArrayList<Comment> comments;
+    public ArrayList<Comment> comments;
     
     /**
      * DataBlocks
      */
-    ArrayList<DataBlock> dataBlocks;
+    public ArrayList<DataBlock> dataBlocks;
     
     /**
      * @param env What {@link #env} is set to.
      */
     public CIF(Mol_Environment env){
         super(env);
+        this.name2key = new HashMap<>();
         this.key2name = new HashMap<>();
         this.comments = new ArrayList<>();
         this.dataBlocks = new ArrayList<>();

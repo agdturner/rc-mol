@@ -13,43 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
-import uk.ac.leeds.ccg.mol.core.Mol_Strings;
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- *
+ * Class Entry.
  * @author Andy Turner
  */
-public class DataItem {
+public class Entry extends Category {
     
     /**
-     * The category.
+     * "entry"
      */
-    private final Category category;
+    public static String s_entry = "entry";
     
     /**
-     * The name.
+     * Create a new instance.
      */
-    private final String name;
-    
-    /**
-     * The value. 
-     */
-    private String value;
-    
-    public DataItem(Category category, String name, String value) {
-        this.category = category;
-        this.name = name;
-        this.value = value;
-    }
-    
-    /**
-     * @return The mmCIF token.
-     */
-    public String getToken() {
-        return Mol_Strings.symbol_underscore + category.name 
-                + Mol_Strings.symbol_dot + name;
+    public Entry() {
+        super(s_entry);
     }
     
 }

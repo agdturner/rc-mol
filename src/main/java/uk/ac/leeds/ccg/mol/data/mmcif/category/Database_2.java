@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
+
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- *
+ * Class Entry.
  * @author Andy Turner
  */
-public class MMCIF {
+public class Database_2 extends Category {
     
-    String categoryName;
+    /**
+     * "entry"
+     */
+    public static String s_database_2 = "database_2";
     
-    String attributeName;
-                
+    /**
+     * Create a new instance.
+     */
+    public Database_2() {
+        super(s_database_2);
+    }
     
 }

@@ -13,40 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.core;
+package uk.ac.leeds.ccg.mol.data.cif;
 
-import java.io.IOException;
-import uk.ac.leeds.ccg.data.core.Data_Environment;
-import uk.ac.leeds.ccg.generic.core.Generic_Environment;
+import uk.ac.leeds.ccg.data.id.Data_ID_int;
 
 /**
- * An Environment class.
- * 
+ * Category_ID
  * @author Andy Turner
  */
-public class Mol_Environment extends Data_Environment {
-    
-    /**
-     * The Line Separator.
-     */
-    public static String EOL = System.getProperty("line.separator");
-    
+public class Category_ID extends Data_ID_int {
+
     private static final long serialVersionUID = 1L;
     
     /**
-     * For commonly used strings.
+     * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public static Mol_Strings strings;
-    
-    /**
-     * Create a new instance
-     * 
-     * @param e The Generic_Environment.
-     * @throws java.io.IOException
-     */
-    public Mol_Environment(Generic_Environment e) throws IOException {
-        super(e);
-        strings = new Mol_Strings();
-    } 
+    public Category_ID(int id){
+        super(id);
+    }
     
 }

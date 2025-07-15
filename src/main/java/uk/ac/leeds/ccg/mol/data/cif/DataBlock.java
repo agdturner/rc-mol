@@ -21,38 +21,60 @@ import uk.ac.leeds.ccg.mol.core.Mol_Object;
  */
 
 /**
- *
+ * DataBlock class.
  * @author Andy Turner
  */
 public class DataBlock extends Mol_Object {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The DataBlockHeading.
      */
     public DataBlockHeading dbh;
-
+    
     /**
-     * The DataItems
+     * The categories
      */
-    public HashMap<DataItem_ID, DataItem> dis;
+    HashMap<Category_ID, Category> categories;
 
     /**
      * The SaveFrame
      */
     public SaveFrame sf;
+    
+    /**
+     * Create a new instance.
+     * @param env What {@link #env} is set to.
+     * @param dbh What {@link #dbh} is set to.
+     */
+    public DataBlock(Mol_Environment env, DataBlockHeading dbh){
+        this(env, dbh, new HashMap<>());
+    }
 
     /**
      * Create a new instance.
      * @param env What {@link #env} is set to.
      * @param dbh What {@link #dbh} is set to.
-     * @param dis What {@link #dis} is set to.
+     * @param categories What {@link #categories} is set to.
+     */
+    public DataBlock(Mol_Environment env, DataBlockHeading dbh, 
+            HashMap<Category_ID, Category> categories){
+        this(env, dbh, categories, null);
+    }
+
+    /**
+     * Create a new instance.
+     * @param env What {@link #env} is set to.
+     * @param dbh What {@link #dbh} is set to.
+     * @param categories What {@link #categories} is set to.
      * @param sf What {@link #sf} is set to.
      */
     public DataBlock(Mol_Environment env, DataBlockHeading dbh, 
-            HashMap<DataItem_ID, DataItem> dis, SaveFrame sf) {
+            HashMap<Category_ID, Category> categories, SaveFrame sf) {
         super(env);
         this.dbh = dbh;
-        this.dis = dis;
+        this.categories = categories;
         this.sf = sf;
     }
     
@@ -63,7 +85,7 @@ public class DataBlock extends Mol_Object {
     public String toString() {
         StringBuilder sb = new StringBuilder(dbh.toString());
         sb.append(Mol_Environment.EOL);
-        sb.append(dis.toString());
+        sb.append(categories.toString());
         sb.append(Mol_Environment.EOL);
         if (sf != null) {
             sb.append(sf.toString());

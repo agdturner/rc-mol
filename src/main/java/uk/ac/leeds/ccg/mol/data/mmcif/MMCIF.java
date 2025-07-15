@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif.category;
-
-import uk.ac.leeds.ccg.mol.data.cif.DataItem;
+package uk.ac.leeds.ccg.mol.data.mmcif;
 
 /**
  *
  * @author Andy Turner
  */
-public class Audit_Conform extends DataItem {
+public class MMCIF {
     
-    public Audit_Conform() {
-        super("audit_conform", );
-    }
+    String categoryName;
+    
+    String attributeName;
+                
     
 }

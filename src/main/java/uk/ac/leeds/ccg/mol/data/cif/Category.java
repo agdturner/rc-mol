@@ -15,10 +15,65 @@
  */
 package uk.ac.leeds.ccg.mol.data.cif;
 
+import java.util.HashMap;
+import java.util.OptionalInt;
+
 /**
- *
+ * Category class.
  * @author Andy Turner
  */
 public class Category {
+    
+    /**
+     * The name.
+     */
+    public final String name;
+
+    /**
+     * The DataItems
+     */
+    public HashMap<DataItem_ID, DataItem> dis;
+    
+    /**
+     * Create a new instance.
+     * 
+     * @param name What {@link name} is set to.
+     */
+    public Category(String name){
+        this(name, new HashMap<>());
+    }
+    
+    /**
+     * Create a new instance.
+     * 
+     * @param name What {@link name} is set to.
+     * @param dis What {@link dis} is set to.
+     */
+    public Category(String name, HashMap<DataItem_ID, DataItem> dis){
+        this.name = name;
+        this.dis = dis;
+    }
+    
+    /**
+     * Adds or replaces the DataItem with the DataItem ID.
+     * @param id The DataItem ID.
+     * @param di The DataItem
+     * @return The existing data item or null.
+     */
+    public DataItem setDataItem(DataItem_ID id, DataItem di) {
+        DataItem r = dis.get(id);
+        dis.put(id, di);
+        return r;
+    }
+    
+    /**
+     * @return The maximum token length for all DataItems in {@link #dis}. 
+     */
+    public int getTokenMaxLength() {
+        OptionalInt o = dis.values().stream().map(DataItem::getToken)
+                            .mapToInt(String::length)
+                            .max();
+        return o.orElse(-1); // Return value held by o, or -1 if there is no value.
+    }
     
 }

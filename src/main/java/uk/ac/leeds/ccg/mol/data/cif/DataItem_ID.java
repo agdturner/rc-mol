@@ -22,6 +22,8 @@ import uk.ac.leeds.ccg.data.id.Data_ID_int;
  * @author Andy Turner
  */
 public class DataItem_ID extends Data_ID_int {
+
+    private static final long serialVersionUID = 1L;
     
     /**
      * Create a new instance.

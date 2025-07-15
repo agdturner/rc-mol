@@ -24,6 +24,8 @@ import uk.ac.leeds.ccg.mol.core.Mol_Object;
  * @author Andy Turner
  */
 public class Heading extends Mol_Object {
+
+    private static final long serialVersionUID = 1L;
     
     /**
      * The type that distinguishes this.
