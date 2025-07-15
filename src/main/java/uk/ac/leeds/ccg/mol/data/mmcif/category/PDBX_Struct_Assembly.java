@@ -18,10 +18,10 @@ package uk.ac.leeds.ccg.mol.data.mmcif.category;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * PDBX_Struct_Assembley Category.
+ * PDBX_Struct_Assembly Category.
  * @author Andy Turner
  */
-public class PDBX_Struct_Assembley extends Category {
+public class PDBX_Struct_Assembly extends Category {
     
     /**
      * "pdbx_struct_assembly"
@@ -31,7 +31,7 @@ public class PDBX_Struct_Assembley extends Category {
     /**
      * Create a new instance.
      */
-    public PDBX_Struct_Assembley() {
+    public PDBX_Struct_Assembly() {
         super(s_pdbx_struct_assembly);
     }
     

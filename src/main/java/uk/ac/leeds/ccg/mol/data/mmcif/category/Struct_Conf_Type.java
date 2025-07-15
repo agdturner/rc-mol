@@ -18,21 +18,21 @@ package uk.ac.leeds.ccg.mol.data.mmcif.category;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * PDBX_Struct_Assembley_Gen Category.
+ * Struct_Conf_Type Category.
  * @author Andy Turner
  */
-public class PDBX_Struct_Assembley_Gen extends Category {
+public class Struct_Conf_Type extends Category {
     
     /**
-     * "pdbx_struct_assembly_gen"
+     * "struct_conf_type"
      */
-    public static String s_pdbx_struct_assembly_gen = "pdbx_struct_assembly_gen";
+    public static String s_struct_conf_type = "struct_conf_type";
     
     /**
      * Create a new instance.
      */
-    public PDBX_Struct_Assembley_Gen() {
-        super(s_pdbx_struct_assembly_gen);
+    public Struct_Conf_Type() {
+        super(s_struct_conf_type);
     }
     
 }

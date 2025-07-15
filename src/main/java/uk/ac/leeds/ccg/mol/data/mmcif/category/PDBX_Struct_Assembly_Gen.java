@@ -18,21 +18,21 @@ package uk.ac.leeds.ccg.mol.data.mmcif.category;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * PDBX_Struct_Assembley_Auth_Evidence Category.
+ * PDBX_Struct_Assembly_Gen Category.
  * @author Andy Turner
  */
-public class PDBX_Struct_Assembley_Auth_Evidence extends Category {
+public class PDBX_Struct_Assembly_Gen extends Category {
     
     /**
-     * "pdbx_struct_assembly_auth_evidence"
+     * "pdbx_struct_assembly_gen"
      */
-    public static String s_pdbx_struct_assembly_auth_evidence = "pdbx_struct_assembly_auth_evidence";
+    public static String s_pdbx_struct_assembly_gen = "pdbx_struct_assembly_gen";
     
     /**
      * Create a new instance.
      */
-    public PDBX_Struct_Assembley_Auth_Evidence() {
-        super(s_pdbx_struct_assembly_auth_evidence);
+    public PDBX_Struct_Assembly_Gen() {
+        super(s_pdbx_struct_assembly_gen);
     }
     
 }

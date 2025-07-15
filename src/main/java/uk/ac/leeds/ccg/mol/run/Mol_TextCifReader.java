@@ -57,13 +57,16 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Item;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Related;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Status;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Poly_Seq_Scheme;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembley;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembley_Auth_Evidence;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembley_Gen;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Auth_Evidence;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Gen;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Oper_List;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Unobs_or_Zero_Occ_Atoms;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Asym;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf_Type;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conn;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Keywords;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref_Seq;
@@ -218,14 +221,20 @@ public class Mol_TextCifReader {
             c = new Struct_Ref_Seq();
         } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq_Dif.s_struct_ref_seq_dif)) {
             c = new Struct_Ref_Seq_Dif();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembley.s_pdbx_struct_assembly)) {
-            c = new PDBX_Struct_Assembley();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembley_Gen.s_pdbx_struct_assembly_gen)) {
-            c = new PDBX_Struct_Assembley_Gen();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembley_Auth_Evidence.s_pdbx_struct_assembly_auth_evidence)) {
-            c = new PDBX_Struct_Assembley_Auth_Evidence();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly.s_pdbx_struct_assembly)) {
+            c = new PDBX_Struct_Assembly();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.s_pdbx_struct_assembly_gen)) {
+            c = new PDBX_Struct_Assembly_Gen();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Auth_Evidence.s_pdbx_struct_assembly_auth_evidence)) {
+            c = new PDBX_Struct_Assembly_Auth_Evidence();
         } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Oper_List.s_pdbx_struct_oper_list)) {
             c = new PDBX_Struct_Oper_List();
+        } else if (categoryName.equalsIgnoreCase(Struct_Conf.s_struct_conf)) {
+            c = new Struct_Conf();
+        } else if (categoryName.equalsIgnoreCase(Struct_Conf_Type.s_struct_conf_type)) {
+            c = new Struct_Conf_Type();
+        } else if (categoryName.equalsIgnoreCase(Struct_Conn.s_struct_conn)) {
+            c = new Struct_Conn();
             
             
         } else {
