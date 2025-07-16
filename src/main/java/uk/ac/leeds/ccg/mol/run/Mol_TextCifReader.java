@@ -41,6 +41,10 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation_Author;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Database_2;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Admin;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_CTF_Correction;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_Molwt;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_NaturalSource;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Name_Com;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Poly;
@@ -64,8 +68,12 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Oper_List;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Sheet_Hbond;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Unobs_or_Zero_Occ_Atoms;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Close_Contact;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Main_Chain_Plane;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide_Omega;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Angle;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Bond;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Torsion;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Asym;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf;
@@ -279,6 +287,23 @@ public class Mol_TextCifReader {
             c = new PDBX_Validate_RMSD_Bond();
         } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.s_pdbx_validate_rmsd_angle)) {
             c = new PDBX_Validate_RMSD_Angle();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Torsion.s_pdbx_validate_torsion)) {
+            c = new PDBX_Validate_Torsion();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide.s_pdbx_validate_peptide)) {
+            c = new PDBX_Validate_Peptide();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide_Omega.s_pdbx_validate_peptide_omega)) {
+            c = new PDBX_Validate_Peptide_Omega();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.s_pdbx_validate_main_chain_plane)) {
+            c = new PDBX_Validate_Main_Chain_Plane();
+            
+        } else if (categoryName.equalsIgnoreCase(EM_Admin.s_em_admin)) {
+            c = new EM_Admin();
+        } else if (categoryName.equalsIgnoreCase(EM_CTF_Correction.s_em_ctf_correction)) {
+            c = new EM_CTF_Correction();
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.s_entity_assembly_molwt)) {
+            c = new EM_Entity_Assembly_Molwt();
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.s_entity_assembly_naturalsource)) {
+            c = new EM_Entity_Assembly_NaturalSource();
 
         } else {
             throw new Exception("Unrecognised category name");
