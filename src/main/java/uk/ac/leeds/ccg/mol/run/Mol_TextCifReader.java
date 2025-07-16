@@ -61,16 +61,25 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Auth_Evidence;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Gen;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Oper_List;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Sheet_Hbond;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Unobs_or_Zero_Occ_Atoms;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Close_Contact;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Angle;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Bond;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Asym;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf_Type;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conn;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conn_Type;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Keywords;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Mon_Prot_Cis;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref_Seq;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref_Seq_Dif;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet_Order;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet_Range;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Symmetry;
 
 /**
@@ -144,7 +153,24 @@ public class Mol_TextCifReader {
                             Variable_ID id = new Variable_ID(ex.cif.id2name.size());
                             ex.cif.name2id.put(nameAndValue[0], id);
                             ex.cif.id2name.put(id, nameAndValue[0]);
-                            DataItem di = new DataItem(category, nameAndValue[0], nameAndValue[1]);
+                            DataItem di;
+                            if (nameAndValue.length > 2) {
+                                String value = "";
+                                for (int i = 1; i < nameAndValue.length; i++) {
+                                    value += nameAndValue[i];
+                                }
+                                di = new DataItem(category, nameAndValue[0], value);
+                            } else if (nameAndValue.length == 2) {
+                                di = new DataItem(category, nameAndValue[0], nameAndValue[1]);
+                            } else {
+                                line = ex.reader.readLine();
+                                System.out.println(line);
+                                if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                                    di = new DataItem(category, nameAndValue[0], line.substring(0));
+                                } else {
+                                    throw new Exception("Missing value");
+                                }
+                            }
                             category.variables.put(id, di);
                         }
                     }
@@ -235,8 +261,25 @@ public class Mol_TextCifReader {
             c = new Struct_Conf_Type();
         } else if (categoryName.equalsIgnoreCase(Struct_Conn.s_struct_conn)) {
             c = new Struct_Conn();
-            
-            
+        } else if (categoryName.equalsIgnoreCase(Struct_Conn_Type.s_struct_conn_type)) {
+            c = new Struct_Conn_Type();
+        } else if (categoryName.equalsIgnoreCase(Struct_Mon_Prot_Cis.s_struct_mon_prot_cis)) {
+            c = new Struct_Mon_Prot_Cis();
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet.s_struct_sheet)) {
+            c = new Struct_Sheet();
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Order.s_struct_sheet_order)) {
+            c = new Struct_Sheet_Order();
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Range.s_struct_sheet_range)) {
+            c = new Struct_Sheet_Range();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Sheet_Hbond.s_pdbx_struct_sheet_hbond)) {
+            c = new PDBX_Struct_Sheet_Hbond();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Close_Contact.s_pdbx_validate_close_contact)) {
+            c = new PDBX_Validate_Close_Contact();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Bond.s_pdbx_validate_rmsd_bond)) {
+            c = new PDBX_Validate_RMSD_Bond();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.s_pdbx_validate_rmsd_angle)) {
+            c = new PDBX_Validate_RMSD_Angle();
+
         } else {
             throw new Exception("Unrecognised category name");
         }
