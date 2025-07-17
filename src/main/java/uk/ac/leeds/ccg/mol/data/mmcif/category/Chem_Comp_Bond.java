@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
-import uk.ac.leeds.ccg.data.id.Data_ID_int;
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Category_ID class.
+ * Chem_Comp_Bond Category.
  * @author Andy Turner
  */
-public class Category_ID extends Data_ID_int {
-
-    private static final long serialVersionUID = 1L;
+public class Chem_Comp_Bond extends Category {
+    
+    /**
+     * "chem_comp_bond"
+     */
+    public static String s_chem_comp_bond = "chem_comp_bond";
     
     /**
      * Create a new instance.
-     * @param id What {@link #id} is set to.
      */
-    public Category_ID(int id){
-        super(id);
+    public Chem_Comp_Bond() {
+        super(s_chem_comp_bond);
     }
     
 }

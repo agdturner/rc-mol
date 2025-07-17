@@ -26,13 +26,13 @@ public class EM_Entity_Assembly_NaturalSource extends Category {
     /**
      * "em_entity_assembly_naturalsource"
      */
-    public static String s_entity_assembly_naturalsource = "entity_assembly_naturalsource";
+    public static String s_em_entity_assembly_naturalsource = "em_entity_assembly_naturalsource";
     
     /**
      * Create a new instance.
      */
     public EM_Entity_Assembly_NaturalSource() {
-        super(s_entity_assembly_naturalsource);
+        super(s_em_entity_assembly_naturalsource);
     }
     
 }

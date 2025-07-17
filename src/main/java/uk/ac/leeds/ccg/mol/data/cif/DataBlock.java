@@ -32,11 +32,35 @@ public class DataBlock extends Mol_Object {
      * The DataBlockHeading.
      */
     public DataBlockHeading dbh;
+    /**
+     * A look up from a Column name to a Column_ID.
+     */
+    public HashMap<String, Columns_ID> columnsName2ColumnsId;
+
+    /**
+     * A look up from a Column_ID to a Column name.
+     */
+    public HashMap<Columns_ID, String> columnsId2ColumnsName;
     
     /**
-     * The categories
+     * Columnss
      */
-    HashMap<Category_ID, Category> categories;
+    public ArrayList<Columns> columnss;
+            
+    /**
+     * A look up from a DataItem name to a DataItem_ID.
+     */
+    public HashMap<String, DataItems_ID> dataItemsName2DataItemsId;
+
+    /**
+     * A look up from a DataItem_ID to a DataItem name.
+     */
+    public HashMap<DataItems_ID, String> dataItemsId2DataItemsName;
+
+    /**
+     * DataItemss
+     */
+    public ArrayList<DataItems> dataItemss;
 
     /**
      * The SaveFrame
@@ -49,33 +73,25 @@ public class DataBlock extends Mol_Object {
      * @param dbh What {@link #dbh} is set to.
      */
     public DataBlock(Mol_Environment env, DataBlockHeading dbh){
-        this(env, dbh, new HashMap<>());
+        this(env, dbh, null);
     }
 
     /**
      * Create a new instance.
      * @param env What {@link #env} is set to.
      * @param dbh What {@link #dbh} is set to.
-     * @param categories What {@link #categories} is set to.
-     */
-    public DataBlock(Mol_Environment env, DataBlockHeading dbh, 
-            HashMap<Category_ID, Category> categories){
-        this(env, dbh, categories, null);
-    }
-
-    /**
-     * Create a new instance.
-     * @param env What {@link #env} is set to.
-     * @param dbh What {@link #dbh} is set to.
-     * @param categories What {@link #categories} is set to.
      * @param sf What {@link #sf} is set to.
      */
-    public DataBlock(Mol_Environment env, DataBlockHeading dbh, 
-            HashMap<Category_ID, Category> categories, SaveFrame sf) {
+    public DataBlock(Mol_Environment env, DataBlockHeading dbh, SaveFrame sf) {
         super(env);
         this.dbh = dbh;
-        this.categories = categories;
         this.sf = sf;
+        columnName2ColumnId = new HashMap<>();
+        columnId2ColumnName = new HashMap<>();
+        columnss = new HashMap<>();
+        dataItemName2DataItemId = new HashMap<>();
+        dataItemId2DataItemName = new HashMap<>();
+        dataItemss = new HashMap<>();
     }
     
     /**
@@ -85,12 +101,12 @@ public class DataBlock extends Mol_Object {
     public String toString() {
         StringBuilder sb = new StringBuilder(dbh.toString());
         sb.append(Mol_Environment.EOL);
-        sb.append(categories.toString());
-        sb.append(Mol_Environment.EOL);
-        if (sf != null) {
-            sb.append(sf.toString());
-            sb.append(Mol_Environment.EOL);
-        }
+//        sb.append(categories.toString());
+//        sb.append(Mol_Environment.EOL);
+//        if (sf != null) {
+//            sb.append(sf.toString());
+//            sb.append(Mol_Environment.EOL);
+//        }
         return sb.toString();
     }
 

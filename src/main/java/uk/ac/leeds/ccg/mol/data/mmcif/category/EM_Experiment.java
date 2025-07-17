@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
-import uk.ac.leeds.ccg.data.id.Data_ID_int;
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Category_ID class.
+ * EM_Experiment Category.
  * @author Andy Turner
  */
-public class Category_ID extends Data_ID_int {
-
-    private static final long serialVersionUID = 1L;
+public class EM_Experiment extends Category {
+    
+    /**
+     * "em_admin"
+     */
+    public static String s_em_experiment = "em_experiment";
     
     /**
      * Create a new instance.
-     * @param id What {@link #id} is set to.
      */
-    public Category_ID(int id){
-        super(id);
+    public EM_Experiment() {
+        super(s_em_experiment);
     }
     
 }

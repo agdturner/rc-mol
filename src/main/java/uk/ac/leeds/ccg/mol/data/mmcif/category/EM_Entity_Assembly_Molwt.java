@@ -26,13 +26,13 @@ public class EM_Entity_Assembly_Molwt extends Category {
     /**
      * "em_entity_assembly_molwt"
      */
-    public static String s_entity_assembly_molwt = "entity_assembly_molwt";
+    public static String s_em_entity_assembly_molwt = "em_entity_assembly_molwt";
     
     /**
      * Create a new instance.
      */
     public EM_Entity_Assembly_Molwt() {
-        super(s_entity_assembly_molwt);
+        super(s_em_entity_assembly_molwt);
     }
     
 }

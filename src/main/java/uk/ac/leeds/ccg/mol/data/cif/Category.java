@@ -16,7 +16,10 @@
 package uk.ac.leeds.ccg.mol.data.cif;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.OptionalInt;
+import uk.ac.leeds.ccg.mol.core.Mol_Environment;
+import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
 /**
  * Category class.
@@ -28,52 +31,21 @@ public class Category {
      * The name.
      */
     public final String name;
-
+    
     /**
-     * The Variables
+     * The id.
      */
-    public HashMap<Variable_ID, Variable> variables;
+    public final Category_ID id;
     
     /**
      * Create a new instance.
      * 
      * @param name What {@link name} is set to.
+     * @param id What {@link id} is set to.
      */
-    public Category(String name){
-        this(name, new HashMap<>());
-    }
-    
-    /**
-     * Create a new instance.
-     * 
-     * @param name What {@link name} is set to.
-     * @param variables What {@link #variables} is set to.
-     */
-    public Category(String name, HashMap<Variable_ID, Variable> variables){
+    public Category(String name, Category_ID id){
         this.name = name;
-        this.variables = variables;
-    }
-    
-    /**
-     * Adds or replaces the Variable with the Variable ID.
-     * @param id The Variable ID.
-     * @param v The Variable.
-     * @return The existing Variable or null.
-     */
-    public Variable setVariable(Variable_ID id, Variable v) {
-        Variable r = variables.get(id);
-        variables.put(id, v);
-        return r;
-    }
-    
-    /**
-     * @return The maximum token length for all DataItems in {@link #variables}. 
-     */
-    public int getTokenMaxLength() {
-        OptionalInt o = variables.values().stream().map(Variable::getToken)
-                            .mapToInt(String::length)
-                            .max();
-        return o.orElse(-1); // Return value held by o, or -1 if there is no value.
+        this.id = id;
     }
     
 }

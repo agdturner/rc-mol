@@ -29,22 +29,40 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
 import uk.ac.leeds.ccg.mol.data.cif.Column;
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
 import uk.ac.leeds.ccg.mol.data.cif.Comment;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlock;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlockHeading;
 import uk.ac.leeds.ccg.mol.data.cif.DataItem;
+import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Variable_ID;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Site;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Sites;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Audit_Author;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Audit_Conform;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Cell;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp_Atom;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp_Bond;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation_Author;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Database_2;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_3D_Fitting;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_3D_Reconstruction;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Admin;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Buffer;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_CTF_Correction;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_Molwt;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_NaturalSource;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Experiment;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Image_Processing;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Image_Recording;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Imaging;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Single_Particle_Entity;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Software;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Specimen;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Vitrification;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Name_Com;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Poly;
@@ -52,12 +70,15 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Poly_Seq;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Src_Nat;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Entry;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Exptl;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_Conf_NA;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_NA_Base_Pair;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_NA_Base_Pair_Step;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Category;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Details;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Group;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_History;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Item;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Support;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Related;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Status;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Poly_Seq_Scheme;
@@ -71,6 +92,7 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Close_Contact;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Main_Chain_Plane;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide_Omega;
+import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Polymer_Linkage;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Angle;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Bond;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Torsion;
@@ -151,16 +173,19 @@ public class Mol_TextCifReader {
                     ex.cif.dataBlocks.add(db);
                 } else {
                     if (line.startsWith(Mol_Strings.s_loop_)) {
+                        // Columnss
                         ex.parseLoop();
                     } else {
+                        // DataItemss
                         if (line.startsWith(Mol_Strings.symbol_underscore)) {
                             String[] parts = line.split("\\."); // Need to escape the dot
                             String categoryName = parts[0].substring(1);
                             Category category = ex.getCategory(categoryName);
                             String[] nameAndValue = parts[1].split("\\s+");
-                            Variable_ID id = new Variable_ID(ex.cif.id2name.size());
-                            ex.cif.name2id.put(nameAndValue[0], id);
-                            ex.cif.id2name.put(id, nameAndValue[0]);
+                            ArrayList<DataItem> dataItems = new ArrayList<>();
+                            DataItems_ID id = new DataItems_ID(db.dataItemsId2DataItemsName.size());
+                            db.dataItemsName2DataItemsId.put(nameAndValue[0], id);
+                            db.dataItemsId2DataItemsName.put(id, nameAndValue[0]);
                             DataItem di;
                             if (nameAndValue.length > 2) {
                                 String value = "";
@@ -227,8 +252,13 @@ public class Mol_TextCifReader {
             c = new Entity_Poly();
         } else if (categoryName.equalsIgnoreCase(Entity_Poly_Seq.s_entity_poly_seq)) {
             c = new Entity_Poly_Seq();
+        } else if (categoryName.equalsIgnoreCase(NDB_Struct_Conf_NA.s_ndb_struct_conf_na)) {
+            c = new NDB_Struct_Conf_NA();
+        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair.s_ndb_struct_na_base_pair)) {
+            c = new NDB_Struct_NA_Base_Pair();
         } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.s_ndb_struct_na_base_pair_step)) {
-            c = new Entity_Poly();
+            c = new NDB_Struct_NA_Base_Pair_Step();
+            
         } else if (categoryName.equalsIgnoreCase(Entity_Src_Nat.s_entity_src_nat)) {
             c = new Entity_Src_Nat();
         } else if (categoryName.equalsIgnoreCase(Chem_Comp.s_chem_comp)) {
@@ -295,15 +325,51 @@ public class Mol_TextCifReader {
             c = new PDBX_Validate_Peptide_Omega();
         } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.s_pdbx_validate_main_chain_plane)) {
             c = new PDBX_Validate_Main_Chain_Plane();
-            
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Polymer_Linkage.s_pdbx_validate_polymer_linkage)) {
+            c = new PDBX_Validate_Polymer_Linkage();
+        } else if (categoryName.equalsIgnoreCase(EM_3D_Fitting.s_em_3d_fitting)) {
+            c = new EM_3D_Fitting();
+        } else if (categoryName.equalsIgnoreCase(EM_3D_Reconstruction.s_em_3d_reconstruction)) {
+            c = new EM_3D_Reconstruction();
+        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Atom.s_chem_comp_atom)) {
+            c = new Chem_Comp_Atom();
+        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Bond.s_chem_comp_bond)) {    
+            c = new Chem_Comp_Bond();            
         } else if (categoryName.equalsIgnoreCase(EM_Admin.s_em_admin)) {
             c = new EM_Admin();
         } else if (categoryName.equalsIgnoreCase(EM_CTF_Correction.s_em_ctf_correction)) {
             c = new EM_CTF_Correction();
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.s_entity_assembly_molwt)) {
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.s_em_entity_assembly_molwt)) {
             c = new EM_Entity_Assembly_Molwt();
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.s_entity_assembly_naturalsource)) {
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.s_em_entity_assembly_naturalsource)) {
             c = new EM_Entity_Assembly_NaturalSource();
+        } else if (categoryName.equalsIgnoreCase(EM_Image_Processing.s_em_image_processing)) {
+            c = new EM_Image_Processing();
+        } else if (categoryName.equalsIgnoreCase(EM_Image_Recording.s_em_image_recording)) {
+            c = new EM_Image_Recording();
+        } else if (categoryName.equalsIgnoreCase(EM_Software.s_em_software)) {
+            c = new EM_Software();
+        } else if (categoryName.equalsIgnoreCase(EM_Specimen.s_em_specimen)) {
+            c = new EM_Specimen();
+        } else if (categoryName.equalsIgnoreCase(EM_Buffer.s_em_buffer)) {
+            c = new EM_Buffer();
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly.s_em_entity_assembly)) {
+            c = new EM_Entity_Assembly();
+        } else if (categoryName.equalsIgnoreCase(EM_Imaging.s_em_imaging)) {
+            c = new EM_Imaging();
+        } else if (categoryName.equalsIgnoreCase(EM_Vitrification.s_em_vitrification)) {
+            c = new EM_Vitrification();
+        } else if (categoryName.equalsIgnoreCase(EM_Experiment.s_em_experiment)) {
+            c = new EM_Experiment();
+        } else if (categoryName.equalsIgnoreCase(EM_Single_Particle_Entity.s_em_single_particle_entity)) {
+            c = new EM_Single_Particle_Entity();
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Support.s_pdbx_audit_support)) {
+            c = new PDBX_Audit_Support();
+        } else if (categoryName.equalsIgnoreCase(Atom_Sites.s_atom_sites)) {
+            c = new Atom_Sites();
+        } else if (categoryName.equalsIgnoreCase(Atom_Site.s_atom_site)) {
+            c = new Atom_Site();
+
 
         } else {
             throw new Exception("Unrecognised category name");

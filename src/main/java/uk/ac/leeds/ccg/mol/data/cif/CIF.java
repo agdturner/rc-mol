@@ -16,7 +16,6 @@
 package uk.ac.leeds.ccg.mol.data.cif;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Object;
 
@@ -29,36 +28,25 @@ public class CIF extends Mol_Object {
     private static final long serialVersionUID = 1L;
     
     /**
-     * A look up from a name to the Variable_ID.
-     */
-    public HashMap<String, Variable_ID> name2id;
-
-    /**
-     * A look up from a Variable_ID to a name.
-     */
-    public HashMap<Variable_ID, String> id2name;
-    
-    /**
-     * Comments
-     */
-    public ArrayList<Comment> comments;
-    
-    /**
-     * DataBlocks
+     * The data.
      */
     public ArrayList<DataBlock> dataBlocks;
+    
+    /**
+     * Comments.
+     */
+    public ArrayList<Comment> comments;
     
     /**
      * @param env What {@link #env} is set to.
      */
     public CIF(Mol_Environment env){
         super(env);
-        this.name2id = new HashMap<>();
-        this.id2name = new HashMap<>();
-        this.comments = new ArrayList<>();
-        this.dataBlocks = new ArrayList<>();
+        dataBlocks = new ArrayList<>();
+        comments = new ArrayList<>();
     }
     
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         comments.stream().forEach(x -> {

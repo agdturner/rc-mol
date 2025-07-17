@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
-import uk.ac.leeds.ccg.data.id.Data_ID_int;
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Category_ID class.
+ * EM_Single_Particle_Entity Category.
  * @author Andy Turner
  */
-public class Category_ID extends Data_ID_int {
-
-    private static final long serialVersionUID = 1L;
+public class EM_Single_Particle_Entity extends Category {
+    
+    /**
+     * "em_single_particle_entity"
+     */
+    public static String s_em_single_particle_entity = "em_single_particle_entity";
     
     /**
      * Create a new instance.
-     * @param id What {@link #id} is set to.
      */
-    public Category_ID(int id){
-        super(id);
+    public EM_Single_Particle_Entity() {
+        super(s_em_single_particle_entity);
     }
     
 }

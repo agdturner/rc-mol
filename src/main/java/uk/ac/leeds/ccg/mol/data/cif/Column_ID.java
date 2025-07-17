@@ -18,10 +18,10 @@ package uk.ac.leeds.ccg.mol.data.cif;
 import uk.ac.leeds.ccg.data.id.Data_ID_int;
 
 /**
- * Category_ID class.
+ * Column_ID class.
  * @author Andy Turner
  */
-public class Category_ID extends Data_ID_int {
+public class Column_ID extends Data_ID_int {
 
     private static final long serialVersionUID = 1L;
     
@@ -29,7 +29,7 @@ public class Category_ID extends Data_ID_int {
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Category_ID(int id){
+    public Column_ID(int id){
         super(id);
     }
     

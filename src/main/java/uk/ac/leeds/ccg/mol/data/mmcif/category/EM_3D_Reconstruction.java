@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
-import uk.ac.leeds.ccg.data.id.Data_ID_int;
+import uk.ac.leeds.ccg.mol.data.cif.Category;
 
 /**
- * Category_ID class.
+ * EM_3D_Reconstruction Category.
  * @author Andy Turner
  */
-public class Category_ID extends Data_ID_int {
-
-    private static final long serialVersionUID = 1L;
+public class EM_3D_Reconstruction extends Category {
+    
+    /**
+     * "em_3d_reconstruction"
+     */
+    public static String s_em_3d_reconstruction = "em_3d_reconstruction";
     
     /**
      * Create a new instance.
-     * @param id What {@link #id} is set to.
      */
-    public Category_ID(int id){
-        super(id);
+    public EM_3D_Reconstruction() {
+        super(s_em_3d_reconstruction);
     }
     
 }

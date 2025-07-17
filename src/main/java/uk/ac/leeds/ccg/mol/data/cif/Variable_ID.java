@@ -18,7 +18,7 @@ package uk.ac.leeds.ccg.mol.data.cif;
 import uk.ac.leeds.ccg.data.id.Data_ID_int;
 
 /**
- * Variable_ID
+ * Variable_ID class.
  * @author Andy Turner
  */
 public class Variable_ID extends Data_ID_int {

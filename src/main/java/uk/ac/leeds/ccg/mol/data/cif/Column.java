@@ -28,7 +28,7 @@ public class Column extends Variable {
     /**
      * The values. 
      */
-    public ArrayList<String> values;
+    public ArrayList<Value> values;
     
     /**
      * Create a new instance.
@@ -38,14 +38,6 @@ public class Column extends Variable {
     public Column(Category category, String name) {
         super(category, name);
         this.values = new ArrayList<>();
-    }
-    
-    /**
-     * Add a value to {@link #values}.
-     * @param value The value to add.
-     */
-    public void addValue(String value) {
-        values.add(value);
     }
     
 }
