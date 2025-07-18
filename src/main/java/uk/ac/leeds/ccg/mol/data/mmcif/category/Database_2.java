@@ -16,6 +16,8 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
+import static uk.ac.leeds.ccg.mol.data.mmcif.category.Citation_Author.NAME;
 
 /**
  * Database_2 Category.
@@ -24,15 +26,16 @@ import uk.ac.leeds.ccg.mol.data.cif.Category;
 public class Database_2 extends Category {
     
     /**
-     * "s_database_2"
+     * "database_2"
      */
-    public static String s_database_2 = "database_2";
+    public static String NAME = "database_2";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Database_2() {
-        super(s_database_2);
+    public Database_2(Category_ID id) {
+        super(NAME, id);
     }
     
 }

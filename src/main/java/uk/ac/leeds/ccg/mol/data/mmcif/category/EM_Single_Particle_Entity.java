@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * EM_Single_Particle_Entity Category.
@@ -26,13 +27,14 @@ public class EM_Single_Particle_Entity extends Category {
     /**
      * "em_single_particle_entity"
      */
-    public static String s_em_single_particle_entity = "em_single_particle_entity";
+    public static String NAME = "em_single_particle_entity";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public EM_Single_Particle_Entity() {
-        super(s_em_single_particle_entity);
+    public EM_Single_Particle_Entity(Category_ID id) {
+        super(NAME, id);
     }
     
 }

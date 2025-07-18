@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Sheet_Range Category.
@@ -26,13 +27,14 @@ public class Struct_Sheet_Range extends Category {
     /**
      * "struct_sheet_range"
      */
-    public static String s_struct_sheet_range = "struct_sheet_range";
+    public static String NAME = "struct_sheet_range";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Sheet_Range() {
-        super(s_struct_sheet_range);
+    public Struct_Sheet_Range(Category_ID id) {
+        super(Struct_Sheet_Order.NAME, id);
     }
     
 }

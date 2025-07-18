@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import uk.ac.leeds.ccg.data.format.Data_ReadCSV;
 import uk.ac.leeds.ccg.data.format.Data_ReadTXT;
 import uk.ac.leeds.ccg.generic.core.Generic_Environment;
 import uk.ac.leeds.ccg.generic.io.Generic_Defaults;
@@ -28,14 +29,18 @@ import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Column;
+import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Comment;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlock;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlockHeading;
 import uk.ac.leeds.ccg.mol.data.cif.DataItem;
 import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Variable_ID;
+import uk.ac.leeds.ccg.mol.data.cif.Value;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Site;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Sites;
 import uk.ac.leeds.ccg.mol.data.mmcif.category.Audit_Author;
@@ -160,7 +165,7 @@ public class Mol_TextCifReader {
 
             ex.cif = new CIF(env);
 
-            DataBlock db;
+            DataBlock db = null;
             String line = ex.reader.readLine();
             System.out.println(line);
             while (line != null) {
@@ -174,37 +179,37 @@ public class Mol_TextCifReader {
                 } else {
                     if (line.startsWith(Mol_Strings.s_loop_)) {
                         // Columnss
-                        ex.parseLoop();
+                        ex.parseLoop(db);
                     } else {
                         // DataItemss
                         if (line.startsWith(Mol_Strings.symbol_underscore)) {
                             String[] parts = line.split("\\."); // Need to escape the dot
                             String categoryName = parts[0].substring(1);
-                            Category category = ex.getCategory(categoryName);
-                            String[] nameAndValue = parts[1].split("\\s+");
+                            Category category = ex.getCategory(categoryName, new DataItems_ID(db.dataItemsId2DataItemsName.size()));
+                            ArrayList<String> nameAndValue = ex.getValues(parts[1]);
                             ArrayList<DataItem> dataItems = new ArrayList<>();
                             DataItems_ID id = new DataItems_ID(db.dataItemsId2DataItemsName.size());
-                            db.dataItemsName2DataItemsId.put(nameAndValue[0], id);
-                            db.dataItemsId2DataItemsName.put(id, nameAndValue[0]);
+                            db.dataItemsName2DataItemsId.put(nameAndValue.get(0), id);
+                            db.dataItemsId2DataItemsName.put(id, nameAndValue.get(0));
                             DataItem di;
-                            if (nameAndValue.length > 2) {
+                            if (nameAndValue.size() > 2) {
                                 String value = "";
-                                for (int i = 1; i < nameAndValue.length; i++) {
-                                    value += nameAndValue[i];
+                                for (int i = 1; i < nameAndValue.size(); i++) {
+                                    value += nameAndValue.get(i);
                                 }
-                                di = new DataItem(category, nameAndValue[0], value);
-                            } else if (nameAndValue.length == 2) {
-                                di = new DataItem(category, nameAndValue[0], nameAndValue[1]);
+                                di = new DataItem(category, nameAndValue.get(0), value);
+                            } else if (nameAndValue.size() == 2) {
+                                di = new DataItem(category, nameAndValue.get(0), nameAndValue.get(1));
                             } else {
                                 line = ex.reader.readLine();
                                 System.out.println(line);
                                 if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                                    di = new DataItem(category, nameAndValue[0], line.substring(0));
+                                    di = new DataItem(category, nameAndValue.get(0), line.substring(0));
                                 } else {
                                     throw new Exception("Missing value");
                                 }
                             }
-                            category.variables.put(id, di);
+                            dataItems.add(di);
                         }
                     }
                 }
@@ -216,160 +221,159 @@ public class Mol_TextCifReader {
         }
     }
 
-    protected Category getCategory(String categoryName) throws Exception {
+    protected Category getCategory(String categoryName, Category_ID id) throws Exception {
         Category c;
-        if (categoryName.equalsIgnoreCase(Entry.s_entry)) {
-            c = new Entry();
-        } else if (categoryName.equalsIgnoreCase(Audit_Conform.s_audit_conform)) {
-            c = new Audit_Conform();
-        } else if (categoryName.equalsIgnoreCase(Database_2.s_database_2)) {
-            c = new Database_2();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_History.s_pdbx_audit_revision_history)) {
-            c = new PDBX_Audit_Revision_History();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Details.s_pdbx_audit_revision_details)) {
-            c = new PDBX_Audit_Revision_Details();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Group.s_pdbx_audit_revision_group)) {
-            c = new PDBX_Audit_Revision_Group();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Category.s_pdbx_audit_revision_category)) {
-            c = new PDBX_Audit_Revision_Category();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Item.s_pdbx_audit_revision_item)) {
-            c = new PDBX_Audit_Revision_Item();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Status.s_pdbx_database_status)) {
-            c = new PDBX_Database_Status();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Related.s_pdbx_database_related)) {
-            c = new PDBX_Database_Related();
-        } else if (categoryName.equalsIgnoreCase(Audit_Author.s_audit_author)) {
-            c = new Audit_Author();
-        } else if (categoryName.equalsIgnoreCase(Citation.s_citation)) {
-            c = new Citation();
-        } else if (categoryName.equalsIgnoreCase(Citation_Author.s_citation_author)) {
-            c = new Citation_Author();
-        } else if (categoryName.equalsIgnoreCase(Entity.s_entity)) {
-            c = new Entity();
-        } else if (categoryName.equalsIgnoreCase(Entity_Name_Com.s_entity_name_com)) {
-            c = new Entity_Name_Com();
-        } else if (categoryName.equalsIgnoreCase(Entity_Poly.s_entity_poly)) {
-            c = new Entity_Poly();
-        } else if (categoryName.equalsIgnoreCase(Entity_Poly_Seq.s_entity_poly_seq)) {
-            c = new Entity_Poly_Seq();
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_Conf_NA.s_ndb_struct_conf_na)) {
-            c = new NDB_Struct_Conf_NA();
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair.s_ndb_struct_na_base_pair)) {
-            c = new NDB_Struct_NA_Base_Pair();
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.s_ndb_struct_na_base_pair_step)) {
-            c = new NDB_Struct_NA_Base_Pair_Step();
-            
-        } else if (categoryName.equalsIgnoreCase(Entity_Src_Nat.s_entity_src_nat)) {
-            c = new Entity_Src_Nat();
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp.s_chem_comp)) {
-            c = new Chem_Comp();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Poly_Seq_Scheme.s_pdbx_poly_seq_scheme)) {
-            c = new PDBX_Poly_Seq_Scheme();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Unobs_or_Zero_Occ_Atoms.s_pdbx_unobs_or_zero_occ_atoms)) {
-            c = new PDBX_Unobs_or_Zero_Occ_Atoms();
-        } else if (categoryName.equalsIgnoreCase(Cell.s_cell)) {
-            c = new Cell();
-        } else if (categoryName.equalsIgnoreCase(Symmetry.s_symmetry)) {
-            c = new Symmetry();
-        } else if (categoryName.equalsIgnoreCase(Exptl.s_exptl)) {
-            c = new Exptl();
-        } else if (categoryName.equalsIgnoreCase(Struct.s_struct)) {
-            c = new Struct();
-        } else if (categoryName.equalsIgnoreCase(Struct_Keywords.s_struct_keywords)) {
-            c = new Struct_Keywords();
-        } else if (categoryName.equalsIgnoreCase(Struct_Asym.s_struct_asym)) {
-            c = new Struct_Asym();
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref.s_struct_ref)) {
-            c = new Struct_Ref();
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq.s_struct_ref_seq)) {
-            c = new Struct_Ref_Seq();
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq_Dif.s_struct_ref_seq_dif)) {
-            c = new Struct_Ref_Seq_Dif();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly.s_pdbx_struct_assembly)) {
-            c = new PDBX_Struct_Assembly();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.s_pdbx_struct_assembly_gen)) {
-            c = new PDBX_Struct_Assembly_Gen();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Auth_Evidence.s_pdbx_struct_assembly_auth_evidence)) {
-            c = new PDBX_Struct_Assembly_Auth_Evidence();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Oper_List.s_pdbx_struct_oper_list)) {
-            c = new PDBX_Struct_Oper_List();
-        } else if (categoryName.equalsIgnoreCase(Struct_Conf.s_struct_conf)) {
-            c = new Struct_Conf();
-        } else if (categoryName.equalsIgnoreCase(Struct_Conf_Type.s_struct_conf_type)) {
-            c = new Struct_Conf_Type();
-        } else if (categoryName.equalsIgnoreCase(Struct_Conn.s_struct_conn)) {
-            c = new Struct_Conn();
-        } else if (categoryName.equalsIgnoreCase(Struct_Conn_Type.s_struct_conn_type)) {
-            c = new Struct_Conn_Type();
-        } else if (categoryName.equalsIgnoreCase(Struct_Mon_Prot_Cis.s_struct_mon_prot_cis)) {
-            c = new Struct_Mon_Prot_Cis();
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet.s_struct_sheet)) {
-            c = new Struct_Sheet();
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Order.s_struct_sheet_order)) {
-            c = new Struct_Sheet_Order();
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Range.s_struct_sheet_range)) {
-            c = new Struct_Sheet_Range();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Sheet_Hbond.s_pdbx_struct_sheet_hbond)) {
-            c = new PDBX_Struct_Sheet_Hbond();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Close_Contact.s_pdbx_validate_close_contact)) {
-            c = new PDBX_Validate_Close_Contact();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Bond.s_pdbx_validate_rmsd_bond)) {
-            c = new PDBX_Validate_RMSD_Bond();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.s_pdbx_validate_rmsd_angle)) {
-            c = new PDBX_Validate_RMSD_Angle();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Torsion.s_pdbx_validate_torsion)) {
-            c = new PDBX_Validate_Torsion();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide.s_pdbx_validate_peptide)) {
-            c = new PDBX_Validate_Peptide();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide_Omega.s_pdbx_validate_peptide_omega)) {
-            c = new PDBX_Validate_Peptide_Omega();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.s_pdbx_validate_main_chain_plane)) {
-            c = new PDBX_Validate_Main_Chain_Plane();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Polymer_Linkage.s_pdbx_validate_polymer_linkage)) {
-            c = new PDBX_Validate_Polymer_Linkage();
-        } else if (categoryName.equalsIgnoreCase(EM_3D_Fitting.s_em_3d_fitting)) {
-            c = new EM_3D_Fitting();
-        } else if (categoryName.equalsIgnoreCase(EM_3D_Reconstruction.s_em_3d_reconstruction)) {
-            c = new EM_3D_Reconstruction();
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Atom.s_chem_comp_atom)) {
-            c = new Chem_Comp_Atom();
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Bond.s_chem_comp_bond)) {    
-            c = new Chem_Comp_Bond();            
-        } else if (categoryName.equalsIgnoreCase(EM_Admin.s_em_admin)) {
-            c = new EM_Admin();
-        } else if (categoryName.equalsIgnoreCase(EM_CTF_Correction.s_em_ctf_correction)) {
-            c = new EM_CTF_Correction();
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.s_em_entity_assembly_molwt)) {
-            c = new EM_Entity_Assembly_Molwt();
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.s_em_entity_assembly_naturalsource)) {
-            c = new EM_Entity_Assembly_NaturalSource();
-        } else if (categoryName.equalsIgnoreCase(EM_Image_Processing.s_em_image_processing)) {
-            c = new EM_Image_Processing();
-        } else if (categoryName.equalsIgnoreCase(EM_Image_Recording.s_em_image_recording)) {
-            c = new EM_Image_Recording();
-        } else if (categoryName.equalsIgnoreCase(EM_Software.s_em_software)) {
-            c = new EM_Software();
-        } else if (categoryName.equalsIgnoreCase(EM_Specimen.s_em_specimen)) {
-            c = new EM_Specimen();
-        } else if (categoryName.equalsIgnoreCase(EM_Buffer.s_em_buffer)) {
-            c = new EM_Buffer();
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly.s_em_entity_assembly)) {
-            c = new EM_Entity_Assembly();
-        } else if (categoryName.equalsIgnoreCase(EM_Imaging.s_em_imaging)) {
-            c = new EM_Imaging();
-        } else if (categoryName.equalsIgnoreCase(EM_Vitrification.s_em_vitrification)) {
-            c = new EM_Vitrification();
-        } else if (categoryName.equalsIgnoreCase(EM_Experiment.s_em_experiment)) {
-            c = new EM_Experiment();
-        } else if (categoryName.equalsIgnoreCase(EM_Single_Particle_Entity.s_em_single_particle_entity)) {
-            c = new EM_Single_Particle_Entity();
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Support.s_pdbx_audit_support)) {
-            c = new PDBX_Audit_Support();
-        } else if (categoryName.equalsIgnoreCase(Atom_Sites.s_atom_sites)) {
-            c = new Atom_Sites();
-        } else if (categoryName.equalsIgnoreCase(Atom_Site.s_atom_site)) {
-            c = new Atom_Site();
+        if (categoryName.equalsIgnoreCase(Entry.NAME)) {
+            c = new Entry(id);
+        } else if (categoryName.equalsIgnoreCase(Audit_Conform.NAME)) {
+            c = new Audit_Conform(id);
+        } else if (categoryName.equalsIgnoreCase(Database_2.NAME)) {
+            c = new Database_2(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_History.NAME)) {
+            c = new PDBX_Audit_Revision_History(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Details.NAME)) {
+            c = new PDBX_Audit_Revision_Details(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Group.NAME)) {
+            c = new PDBX_Audit_Revision_Group(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Category.NAME)) {
+            c = new PDBX_Audit_Revision_Category(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Item.NAME)) {
+            c = new PDBX_Audit_Revision_Item(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Status.NAME)) {
+            c = new PDBX_Database_Status(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Related.NAME)) {
+            c = new PDBX_Database_Related(id);
+        } else if (categoryName.equalsIgnoreCase(Audit_Author.NAME)) {
+            c = new Audit_Author(id);
+        } else if (categoryName.equalsIgnoreCase(Citation.NAME)) {
+            c = new Citation(id);
+        } else if (categoryName.equalsIgnoreCase(Citation_Author.NAME)) {
+            c = new Citation_Author(id);
+        } else if (categoryName.equalsIgnoreCase(Entity.NAME)) {
+            c = new Entity(id);
+        } else if (categoryName.equalsIgnoreCase(Entity_Name_Com.NAME)) {
+            c = new Entity_Name_Com(id);
+        } else if (categoryName.equalsIgnoreCase(Entity_Poly.NAME)) {
+            c = new Entity_Poly(id);
+        } else if (categoryName.equalsIgnoreCase(Entity_Poly_Seq.NAME)) {
+            c = new Entity_Poly_Seq(id);
+        } else if (categoryName.equalsIgnoreCase(NDB_Struct_Conf_NA.NAME)) {
+            c = new NDB_Struct_Conf_NA(id);
+        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair.NAME)) {
+            c = new NDB_Struct_NA_Base_Pair(id);
+        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.NAME)) {
+            c = new NDB_Struct_NA_Base_Pair_Step(id);
 
+        } else if (categoryName.equalsIgnoreCase(Entity_Src_Nat.NAME)) {
+            c = new Entity_Src_Nat(id);
+        } else if (categoryName.equalsIgnoreCase(Chem_Comp.NAME)) {
+            c = new Chem_Comp(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Poly_Seq_Scheme.NAME)) {
+            c = new PDBX_Poly_Seq_Scheme(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Unobs_or_Zero_Occ_Atoms.NAME)) {
+            c = new PDBX_Unobs_or_Zero_Occ_Atoms(id);
+        } else if (categoryName.equalsIgnoreCase(Cell.NAME)) {
+            c = new Cell(id);
+        } else if (categoryName.equalsIgnoreCase(Symmetry.NAME)) {
+            c = new Symmetry(id);
+        } else if (categoryName.equalsIgnoreCase(Exptl.NAME)) {
+            c = new Exptl(id);
+        } else if (categoryName.equalsIgnoreCase(Struct.NAME)) {
+            c = new Struct(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Keywords.NAME)) {
+            c = new Struct_Keywords(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Asym.NAME)) {
+            c = new Struct_Asym(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Ref.NAME)) {
+            c = new Struct_Ref(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq.NAME)) {
+            c = new Struct_Ref_Seq(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq_Dif.NAME)) {
+            c = new Struct_Ref_Seq_Dif(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly.NAME)) {
+            c = new PDBX_Struct_Assembly(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.NAME)) {
+            c = new PDBX_Struct_Assembly_Gen(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Auth_Evidence.NAME)) {
+            c = new PDBX_Struct_Assembly_Auth_Evidence(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Oper_List.NAME)) {
+            c = new PDBX_Struct_Oper_List(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Conf.NAME)) {
+            c = new Struct_Conf(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Conf_Type.NAME)) {
+            c = new Struct_Conf_Type(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Conn.NAME)) {
+            c = new Struct_Conn(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Conn_Type.NAME)) {
+            c = new Struct_Conn_Type(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Mon_Prot_Cis.NAME)) {
+            c = new Struct_Mon_Prot_Cis(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet.NAME)) {
+            c = new Struct_Sheet(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Order.NAME)) {
+            c = new Struct_Sheet_Order(id);
+        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Range.NAME)) {
+            c = new Struct_Sheet_Range(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Sheet_Hbond.NAME)) {
+            c = new PDBX_Struct_Sheet_Hbond(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Close_Contact.NAME)) {
+            c = new PDBX_Validate_Close_Contact(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Bond.NAME)) {
+            c = new PDBX_Validate_RMSD_Bond(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.NAME)) {
+            c = new PDBX_Validate_RMSD_Angle(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Torsion.NAME)) {
+            c = new PDBX_Validate_Torsion(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide.NAME)) {
+            c = new PDBX_Validate_Peptide(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide_Omega.NAME)) {
+            c = new PDBX_Validate_Peptide_Omega(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.NAME)) {
+            c = new PDBX_Validate_Main_Chain_Plane(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Polymer_Linkage.NAME)) {
+            c = new PDBX_Validate_Polymer_Linkage(id);
+        } else if (categoryName.equalsIgnoreCase(EM_3D_Fitting.NAME)) {
+            c = new EM_3D_Fitting(id);
+        } else if (categoryName.equalsIgnoreCase(EM_3D_Reconstruction.NAME)) {
+            c = new EM_3D_Reconstruction(id);
+        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Atom.NAME)) {
+            c = new Chem_Comp_Atom(id);
+        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Bond.NAME)) {
+            c = new Chem_Comp_Bond(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Admin.NAME)) {
+            c = new EM_Admin(id);
+        } else if (categoryName.equalsIgnoreCase(EM_CTF_Correction.NAME)) {
+            c = new EM_CTF_Correction(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.NAME)) {
+            c = new EM_Entity_Assembly_Molwt(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.NAME)) {
+            c = new EM_Entity_Assembly_NaturalSource(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Image_Processing.NAME)) {
+            c = new EM_Image_Processing(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Image_Recording.NAME)) {
+            c = new EM_Image_Recording(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Software.NAME)) {
+            c = new EM_Software(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Specimen.NAME)) {
+            c = new EM_Specimen(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Buffer.NAME)) {
+            c = new EM_Buffer(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly.NAME)) {
+            c = new EM_Entity_Assembly(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Imaging.NAME)) {
+            c = new EM_Imaging(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Vitrification.NAME)) {
+            c = new EM_Vitrification(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Experiment.NAME)) {
+            c = new EM_Experiment(id);
+        } else if (categoryName.equalsIgnoreCase(EM_Single_Particle_Entity.NAME)) {
+            c = new EM_Single_Particle_Entity(id);
+        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Support.NAME)) {
+            c = new PDBX_Audit_Support(id);
+        } else if (categoryName.equalsIgnoreCase(Atom_Sites.NAME)) {
+            c = new Atom_Sites(id);
+        } else if (categoryName.equalsIgnoreCase(Atom_Site.NAME)) {
+            c = new Atom_Site(id);
 
         } else {
             throw new Exception("Unrecognised category name");
@@ -379,33 +383,34 @@ public class Mol_TextCifReader {
 
     /**
      * For parsing a loop.
+     *
+     * @param db The DataBlock
      */
-    protected void parseLoop() {
+    protected void parseLoop(DataBlock db) {
         try {
             String line = reader.readLine();
             System.out.println(line);
             String[] parts = line.split("\\."); // Need to escape the dot
-            String categoryName = parts[0].substring(1);
-            Category category = getCategory(categoryName);
-            // Initialise columns
-            ArrayList<Variable_ID> ids = new ArrayList<>();
-            addColumn(category, parts[1], ids);
+            // Initialise columnss
+            Columns columns = new Columns(parts[0].substring(1),
+                    new Columns_ID(db.columnsId2ColumnsName.size()));
+            db.columnss.add(columns);
             line = reader.readLine();
             System.out.println(line);
+            // Initialise Columns
             while (line.startsWith(Mol_Strings.symbol_underscore)) {
                 parts = line.split("\\."); // Need to escape the dot
-                addColumn(category, parts[1], ids);
+                columns.cols.add(new Column(columns, parts[1]));
                 line = reader.readLine();
                 System.out.println(line);
             }
-            // Initialise values
+            // Add values
             while (!(line.startsWith(Mol_Strings.symbol_underscore)
                     || line.startsWith(Mol_Strings.SYMBOL_HASH))) {
-                parts = line.split("\\s+"); // Need to escape the dot
-                for (int i = 0; i < ids.size(); i++) {
-                    Variable_ID id = ids.get(i);
-                    Column column = (Column) category.variables.get(id);
-                    column.values.add(parts[i]);
+                ArrayList<String> values = getValues(line);
+                for (int col = 0; col < columns.cols.size(); col++) {
+                    Column column = columns.cols.get(col);
+                    column.values.add(new Value(parts[col]));
                 }
                 line = reader.readLine();
                 System.out.println(line);
@@ -416,20 +421,32 @@ public class Mol_TextCifReader {
         }
     }
 
+    public char delimiter = ' ';
+    public String delimiter_s = String.valueOf(delimiter);
+    
     /**
-     * @param category The Category.
-     * @param name The name of the variable.
-     * @param ids The ids to add to.
+     * @param line The line to get the values from.
+     * @return An ArrayList of String values.
      */
-    protected void addColumn(Category category, String name, ArrayList<Variable_ID> ids) {
-        Column column = new Column(category, name);
-        int key = cif.id2name.size();
-        Variable_ID id = new Variable_ID(key);
-        ids.add(id);
-        cif.name2id.put(name, id);
-        cif.id2name.put(id, name);
-        category.setVariable(id, column);
-        category.variables.put(id, column);
+    public ArrayList<String> getValues(String line) {
+        // Replace all white space with a single space.
+        line = line.replace("\\s+", delimiter_s);
+        return Data_ReadCSV.parseLine(line, delimiter);
     }
+
+//    /**
+//     * @param name The name of the variable.
+//     * @param ids The ids to add to.
+//     */
+//    protected void addColumn(Category category, String name, ArrayList<Variable_ID> ids) {
+//        Column column = new Column(category, name);
+//        int key = cif.id2name.size();
+//        Variable_ID id = new Variable_ID(key);
+//        ids.add(id);
+//        cif.name2id.put(name, id);
+//        cif.id2name.put(id, name);
+//        category.setVariable(id, column);
+//        category.variables.put(id, column);
+//    }
 
 }

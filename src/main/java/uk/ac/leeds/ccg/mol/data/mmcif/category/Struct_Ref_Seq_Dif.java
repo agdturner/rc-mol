@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Ref_Seq_Dif Category.
@@ -26,13 +27,14 @@ public class Struct_Ref_Seq_Dif extends Category {
     /**
      * "struct_asym_ref_seq_dif"
      */
-    public static String s_struct_ref_seq_dif = "struct_ref_seq_dif";
+    public static String NAME = "struct_ref_seq_dif";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Ref_Seq_Dif() {
-        super(s_struct_ref_seq_dif);
+    public Struct_Ref_Seq_Dif(Category_ID id) {
+        super(NAME, id);
     }
     
 }

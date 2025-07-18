@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Exptl Category.
@@ -26,13 +27,14 @@ public class Exptl extends Category {
     /**
      * "exptl"
      */
-    public static String s_exptl = "exptl";
+    public static String NAME = "exptl";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Exptl() {
-        super(s_exptl);
+    public Exptl(Category_ID id) {
+        super(NAME, id);
     }
     
 }

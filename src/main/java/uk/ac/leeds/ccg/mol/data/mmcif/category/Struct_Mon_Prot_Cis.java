@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Mon_Prot_Cis Category.
@@ -26,13 +27,14 @@ public class Struct_Mon_Prot_Cis extends Category {
     /**
      * "struct_mon_prot_cis"
      */
-    public static String s_struct_mon_prot_cis = "struct_mon_prot_cis";
+    public static String NAME = "struct_mon_prot_cis";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Mon_Prot_Cis() {
-        super(s_struct_mon_prot_cis);
+    public Struct_Mon_Prot_Cis(Category_ID id) {
+        super(NAME, id);
     }
     
 }

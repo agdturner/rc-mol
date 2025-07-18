@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Chem_Comp_Atom Category.
@@ -26,13 +27,14 @@ public class Chem_Comp_Atom extends Category {
     /**
      * "chem_comp_atom"
      */
-    public static String s_chem_comp_atom = "chem_comp_atom";
+    public static String NAME = "chem_comp_atom";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Chem_Comp_Atom() {
-        super(s_chem_comp_atom);
+    public Chem_Comp_Atom(Category_ID id) {
+        super(NAME, id);
     }
     
 }

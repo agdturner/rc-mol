@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Entity_Src_Nat Category.
@@ -26,13 +27,14 @@ public class Entity_Src_Nat extends Category {
     /**
      * "entity_src_nat"
      */
-    public static String s_entity_src_nat = "entity_src_nat";
+    public static String NAME = "entity_src_nat";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Entity_Src_Nat() {
-        super(s_entity_src_nat);
+    public Entity_Src_Nat(Category_ID id) {
+        super(NAME, id);
     }
     
 }

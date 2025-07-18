@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Sheet_Order Category.
@@ -26,13 +27,14 @@ public class Struct_Sheet_Order extends Category {
     /**
      * "struct_sheet_order"
      */
-    public static String s_struct_sheet_order = "struct_sheet_order";
+    public static String NAME = "struct_sheet_order";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Sheet_Order() {
-        super(s_struct_sheet_order);
+    public Struct_Sheet_Order(Category_ID id) {
+        super(NAME, id);
     }
     
 }

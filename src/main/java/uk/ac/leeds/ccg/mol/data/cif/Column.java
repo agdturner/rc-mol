@@ -1,8 +1,3 @@
-package uk.ac.leeds.ccg.mol.data.cif;
-
-import java.util.ArrayList;
-import uk.ac.leeds.ccg.mol.core.Mol_Strings;
-
 /*
  * Copyright 2025 University of Leeds.
  *
@@ -18,6 +13,10 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package uk.ac.leeds.ccg.mol.data.cif;
+
+import java.util.ArrayList;
+
 
 /**
  * Column class.
@@ -32,11 +31,11 @@ public class Column extends Variable {
     
     /**
      * Create a new instance.
-     * @param category What {@link #category} is set to.
+     * @param columns What {@link #category} is set to.
      * @param name What {@link #name} is set to.
      */
-    public Column(Category category, String name) {
-        super(category, name);
+    public Column(Columns columns, String name) {
+        super(columns, name);
         this.values = new ArrayList<>();
     }
     

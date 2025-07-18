@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * EM_Specimen Category.
@@ -26,13 +27,14 @@ public class EM_Specimen extends Category {
     /**
      * "em_specimen"
      */
-    public static String s_em_specimen = "em_specimen";
+    public static String NAME = "em_specimen";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public EM_Specimen() {
-        super(s_em_specimen);
+    public EM_Specimen(Category_ID id) {
+        super(NAME, id);
     }
     
 }

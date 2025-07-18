@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Entity_Poly_Seq Category.
@@ -26,13 +27,14 @@ public class Entity_Poly_Seq extends Category {
     /**
      * "entity_poly_seq"
      */
-    public static String s_entity_poly_seq = "entity_poly_seq";
+    public static String NAME = "entity_poly_seq";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Entity_Poly_Seq() {
-        super(s_entity_poly_seq);
+    public Entity_Poly_Seq(Category_ID id) {
+        super(NAME, id);
     }
     
 }

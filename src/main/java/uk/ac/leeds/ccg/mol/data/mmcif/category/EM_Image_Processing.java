@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * EM_Image_Processing Category.
@@ -26,13 +27,13 @@ public class EM_Image_Processing extends Category {
     /**
      * "em_image_processing"
      */
-    public static String s_em_image_processing = "em_image_processing";
+    public static String NAME = "em_image_processing";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public EM_Image_Processing() {
-        super(s_em_image_processing);
+    public EM_Image_Processing(Category_ID id) {
+        super(NAME, id);
     }
-    
 }

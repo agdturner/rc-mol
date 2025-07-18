@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Validate_RMSD_Bond Category.
@@ -26,13 +27,14 @@ public class PDBX_Validate_RMSD_Bond extends Category {
     /**
      * "pdbx_validate_rmsd_bond"
      */
-    public static String s_pdbx_validate_rmsd_bond = "pdbx_validate_rmsd_bond";
+    public static String NAME = "pdbx_validate_rmsd_bond";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Validate_RMSD_Bond() {
-        super(s_pdbx_validate_rmsd_bond);
+    public PDBX_Validate_RMSD_Bond(Category_ID id) {
+        super(NAME, id);
     }
     
 }

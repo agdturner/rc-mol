@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Struct_Assembly Category.
@@ -26,13 +27,14 @@ public class PDBX_Struct_Assembly extends Category {
     /**
      * "pdbx_struct_assembly"
      */
-    public static String s_pdbx_struct_assembly = "pdbx_struct_assembly";
+    public static String NAME = "pdbx_struct_assembly";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Struct_Assembly() {
-        super(s_pdbx_struct_assembly);
+    public PDBX_Struct_Assembly(Category_ID id) {
+        super(NAME, id);
     }
     
 }

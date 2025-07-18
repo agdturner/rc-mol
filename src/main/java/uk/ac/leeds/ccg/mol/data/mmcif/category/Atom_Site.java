@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Atom_Site Category.
@@ -26,13 +27,14 @@ public class Atom_Site extends Category {
     /**
      * "atom_site"
      */
-    public static String s_atom_site = "atom_site";
+    public static String NAME = "atom_site";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Atom_Site() {
-        super(s_atom_site);
+    public Atom_Site(Category_ID id) {
+        super(NAME, id);
     }
     
 }

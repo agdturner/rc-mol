@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Conf_Type Category.
@@ -26,13 +27,14 @@ public class Struct_Conf_Type extends Category {
     /**
      * "struct_conf_type"
      */
-    public static String s_struct_conf_type = "struct_conf_type";
+    public static String NAME = "struct_conf_type";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Conf_Type() {
-        super(s_struct_conf_type);
+    public Struct_Conf_Type(Category_ID id) {
+        super(NAME, id);
     }
     
 }

@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Poly_Seq_Scheme Category.
@@ -26,13 +27,14 @@ public class PDBX_Poly_Seq_Scheme extends Category {
     /**
      * "pdbx_poly_seq_scheme"
      */
-    public static String s_pdbx_poly_seq_scheme = "pdbx_poly_seq_scheme";
+    public static String NAME = "pdbx_poly_seq_scheme";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Poly_Seq_Scheme() {
-        super(s_pdbx_poly_seq_scheme);
+    public PDBX_Poly_Seq_Scheme(Category_ID id) {
+        super(NAME, id);
     }
     
 }

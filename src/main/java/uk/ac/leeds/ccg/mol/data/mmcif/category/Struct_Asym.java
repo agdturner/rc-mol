@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Struct_Asym Category.
@@ -26,13 +27,14 @@ public class Struct_Asym extends Category {
     /**
      * "struct_asym"
      */
-    public static String s_struct_asym = "struct_asym";
+    public static String NAME = "struct_asym";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Struct_Asym() {
-        super(s_struct_asym);
+    public Struct_Asym(Category_ID id) {
+        super(NAME, id);
     }
     
 }

@@ -45,7 +45,7 @@ public class Columns extends Category {
      * @param name What {@link name} is set to.
      * @param id What {@link id} is set to.
      */
-    public Columns(String name, Category_ID id){
+    public Columns(String name, Columns_ID id){
         this(name, id, new ArrayList<>());
     }
     
@@ -56,7 +56,7 @@ public class Columns extends Category {
      * @param id What {@link id} is set to.
      * @param rows The data organised as rows of columns.
      */
-    public Columns(String name, Category_ID id, 
+    public Columns(String name, Columns_ID id, 
             ArrayList<ArrayList<Value>> rows) {
         super(name, id);
         int nrows = rows.size();

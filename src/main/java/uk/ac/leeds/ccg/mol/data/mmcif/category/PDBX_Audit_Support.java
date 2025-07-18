@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Audit_Support Category.
@@ -26,13 +27,14 @@ public class PDBX_Audit_Support extends Category {
     /**
      * "pdbx_audit_support"
      */
-    public static String s_pdbx_audit_support = "pdbx_audit_support";
+    public static String NAME = "pdbx_audit_support";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Audit_Support() {
-        super(s_pdbx_audit_support);
+    public PDBX_Audit_Support(Category_ID id) {
+        super(NAME, id);
     }
     
 }

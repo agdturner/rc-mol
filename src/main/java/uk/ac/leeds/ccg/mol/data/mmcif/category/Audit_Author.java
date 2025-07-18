@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Audit_Author Category.
@@ -26,13 +27,14 @@ public class Audit_Author extends Category {
     /**
      * "audit_conform"
      */
-    public static String s_audit_author = "audit_author";
+    public static String NAME = "audit_author";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Audit_Author() {
-        super(s_audit_author);
+    public Audit_Author(Category_ID id) {
+        super(NAME, id);
     }
     
 }

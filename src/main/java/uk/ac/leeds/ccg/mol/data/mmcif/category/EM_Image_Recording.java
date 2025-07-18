@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * EM_Image_Recording Category.
@@ -26,13 +27,14 @@ public class EM_Image_Recording extends Category {
     /**
      * "em_image_recording"
      */
-    public static String s_em_image_recording = "em_image_recording";
+    public static String NAME = "em_image_recording";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public EM_Image_Recording() {
-        super(s_em_image_recording);
+    public EM_Image_Recording(Category_ID id) {
+        super(NAME, id);
     }
     
 }

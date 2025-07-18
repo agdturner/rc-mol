@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Database_Related Category.
@@ -26,13 +27,14 @@ public class PDBX_Database_Related extends Category {
     /**
      * "pdbx_database_related"
      */
-    public static String s_pdbx_database_related = "pdbx_database_related";
+    public static String NAME = "pdbx_database_related";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Database_Related() {
-        super(s_pdbx_database_related);
+    public PDBX_Database_Related(Category_ID id) {
+        super(NAME, id);
     }
     
 }

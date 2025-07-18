@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Entity_Name_Com Category.
@@ -26,13 +27,14 @@ public class Entity_Name_Com extends Category {
     /**
      * "entity_name_com"
      */
-    public static String s_entity_name_com = "entity_name_com";
+    public static String NAME = "entity_name_com";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Entity_Name_Com() {
-        super(s_entity_name_com);
+    public Entity_Name_Com(Category_ID id) {
+        super(NAME, id);
     }
     
 }

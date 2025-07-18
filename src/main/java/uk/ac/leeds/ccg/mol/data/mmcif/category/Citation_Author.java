@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Citation_Author Category.
@@ -26,13 +27,14 @@ public class Citation_Author extends Category {
     /**
      * "citation_author"
      */
-    public static String s_citation_author = "citation_author";
+    public static String NAME = "citation_author";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Citation_Author() {
-        super(s_citation_author);
+    public Citation_Author(Category_ID id) {
+        super(NAME, id);
     }
     
 }

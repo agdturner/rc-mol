@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Symmetry Category.
@@ -26,13 +27,14 @@ public class Symmetry extends Category {
     /**
      * "symmetry"
      */
-    public static String s_symmetry = "symmetry";
+    public static String NAME = "symmetry";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public Symmetry() {
-        super(s_symmetry);
+    public Symmetry(Category_ID id) {
+        super(Struct_Sheet_Order.NAME, id);
     }
     
 }

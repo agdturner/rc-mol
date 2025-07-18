@@ -1,5 +1,6 @@
 package uk.ac.leeds.ccg.mol.data.cif;
 
+import java.util.ArrayList;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import java.util.HashMap;
 import uk.ac.leeds.ccg.mol.core.Mol_Object;
@@ -86,12 +87,12 @@ public class DataBlock extends Mol_Object {
         super(env);
         this.dbh = dbh;
         this.sf = sf;
-        columnName2ColumnId = new HashMap<>();
-        columnId2ColumnName = new HashMap<>();
-        columnss = new HashMap<>();
-        dataItemName2DataItemId = new HashMap<>();
-        dataItemId2DataItemName = new HashMap<>();
-        dataItemss = new HashMap<>();
+        columnsName2ColumnsId = new HashMap<>();
+        columnsId2ColumnsName = new HashMap<>();
+        columnss = new ArrayList<>();
+        dataItemsName2DataItemsId = new HashMap<>();
+        dataItemsId2DataItemsName = new HashMap<>();
+        dataItemss = new ArrayList<>();
     }
     
     /**

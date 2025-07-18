@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * Entry Category.
@@ -26,13 +27,13 @@ public class Entry extends Category {
     /**
      * "entry"
      */
-    public static String s_entry = "entry";
+    public static String NAME = "entry";
     
     /**
      * Create a new instance.
      */
-    public Entry() {
-        super(s_entry);
+    public Entry(Category_ID id) {
+        super(NAME, id);
     }
     
 }

@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.mmcif.category;
 
 import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
  * PDBX_Validate_Peptide Category.
@@ -26,13 +27,14 @@ public class PDBX_Validate_Peptide extends Category {
     /**
      * "pdbx_validate_peptide"
      */
-    public static String s_pdbx_validate_peptide = "pdbx_validate_peptide";
+    public static String NAME = "pdbx_validate_peptide";
     
     /**
      * Create a new instance.
+     * @param id What {@link #id} is set to.
      */
-    public PDBX_Validate_Peptide() {
-        super(s_pdbx_validate_peptide);
+    public PDBX_Validate_Peptide(Category_ID id) {
+        super(NAME, id);
     }
     
 }
