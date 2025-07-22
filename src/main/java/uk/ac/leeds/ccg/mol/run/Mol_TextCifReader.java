@@ -216,6 +216,7 @@ public class Mol_TextCifReader {
                 line = ex.reader.readLine();
                 System.out.println(line);
             }
+            int debug = 1;
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -390,27 +391,80 @@ public class Mol_TextCifReader {
         try {
             String line = reader.readLine();
             System.out.println(line);
+            
+           
             String[] parts = line.split("\\."); // Need to escape the dot
+            
+            if (parts.length == 0) {
+                int debug = 1;
+            }
+            
+            if (parts[0].length() == 0) {
+                int debug = 1;
+            }
+            
             // Initialise columnss
             Columns columns = new Columns(parts[0].substring(1),
                     new Columns_ID(db.columnsId2ColumnsName.size()));
             db.columnss.add(columns);
-            line = reader.readLine();
-            System.out.println(line);
             // Initialise Columns
             while (line.startsWith(Mol_Strings.symbol_underscore)) {
                 parts = line.split("\\."); // Need to escape the dot
-                columns.cols.add(new Column(columns, parts[1]));
+                
+                if (parts.length < 2) {
+                    int debug = 1;
+                }
+                
+                columns.cols.add(new Column(columns, parts[1].trim()));
                 line = reader.readLine();
                 System.out.println(line);
             }
+            
+            
             // Add values
             while (!(line.startsWith(Mol_Strings.symbol_underscore)
                     || line.startsWith(Mol_Strings.SYMBOL_HASH))) {
                 ArrayList<String> values = getValues(line);
+                
+                if (values.size() != columns.cols.size()) {
+                    /**
+                     * This may occur where the next variable is on the next 
+                     * line which should start with ";".
+                     */
+                    String line2 = reader.readLine();
+                    System.out.println(line2);
+                    if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                        if (columns.cols.get(values.size()).name.equalsIgnoreCase("name")) {
+                            values.add(line2.substring(1)); // Strip off the semi-colon.
+                            String line3 = reader.readLine();
+                            System.out.println(line3);
+                            if (line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                                String line4 = reader.readLine();
+                                System.out.println(line4);
+                                values.addAll(getValues(line4));
+                                if (values.size() != columns.cols.size()) {
+                                    int debug = 1;
+                                }
+                            }
+                        } else {
+                            if (columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code")) {
+                                while(values.size() != columns.cols.size()) {
+                                    StringBuilder sb2 = new StringBuilder(line2.substring(1));
+                                    String line3 = reader.readLine().trim();
+                                    while (!line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                                        sb2.append(line3);
+                                        line3 = reader.readLine().trim();
+                                    }
+                                    values.addAll(getValues(sb2.toString()));
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 for (int col = 0; col < columns.cols.size(); col++) {
                     Column column = columns.cols.get(col);
-                    column.values.add(new Value(parts[col]));
+                    column.values.add(new Value(values.get(col)));
                 }
                 line = reader.readLine();
                 System.out.println(line);
@@ -418,6 +472,7 @@ public class Mol_TextCifReader {
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -430,8 +485,8 @@ public class Mol_TextCifReader {
      */
     public ArrayList<String> getValues(String line) {
         // Replace all white space with a single space.
-        line = line.replace("\\s+", delimiter_s);
-        return Data_ReadCSV.parseLine(line, delimiter);
+        String l = line.replaceAll("\\s+", delimiter_s).trim();
+        return Data_ReadCSV.parseLine(l, delimiter);
     }
 
 //    /**

@@ -24,11 +24,11 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 /**
  * Columns class. This represents a loop of data. The data are arranged in rows
  * and columns.
- * 
+ *
  * @author Andy Turner
  */
 public class Columns extends Category {
-    
+
     /**
      * Data in columns.
      */
@@ -38,52 +38,57 @@ public class Columns extends Category {
      * Data in rows.
      */
     public ArrayList<ArrayList<Value>> rows;
-    
+
     /**
      * Create a new instance.
-     * 
+     *
      * @param name What {@link name} is set to.
      * @param id What {@link id} is set to.
      */
-    public Columns(String name, Columns_ID id){
+    public Columns(String name, Columns_ID id) {
         this(name, id, new ArrayList<>());
     }
-    
+
     /**
      * Create a new instance.
-     * 
+     *
      * @param name What {@link name} is set to.
      * @param id What {@link id} is set to.
      * @param rows The data organised as rows of columns.
      */
-    public Columns(String name, Columns_ID id, 
+    public Columns(String name, Columns_ID id,
             ArrayList<ArrayList<Value>> rows) {
         super(name, id);
         int nrows = rows.size();
-        int ncols = rows.get(0).size();
-        cols = new ArrayList<>(ncols);
-        for (int row = 0; row < nrows; row ++ ) {
-            ArrayList<Value> values = rows.get(row);
-            for (int col = 0; col < ncols; col ++) {
-                Column c = cols.get(col);
-                c.values.set(col, values.get(col));
-            }            
+        if (nrows > 0) {
+            int ncols = rows.get(0).size();
+            cols = new ArrayList<>(ncols);
+            for (int row = 0; row < nrows; row++) {
+                ArrayList<Value> values = rows.get(row);
+                for (int col = 0; col < ncols; col++) {
+                    Column c = cols.get(col);
+                    c.values.set(col, values.get(col));
+                }
+            }
+        } else {
+            cols = new ArrayList<>();
         }
     }
-    
+
     /**
      * @param s A line of values.
      */
     public void addRow(String s) {
         ArrayList<String> values = Data_ReadCSV.parseLine(s, ' ');
         int row = rows.size();
-        for (int col = 0; col < values.size(); col ++) {
+        for (int col = 0; col < values.size(); col++) {
             setValue(row, col, new Value(values.get(col)));
         }
     }
-    
+
     /**
      * For getting a value.
+     *
      * @param row The row index of the value to get.
      * @param col The column index of the value to get.
      * @return The value at the given row and column index.
@@ -91,9 +96,10 @@ public class Columns extends Category {
     public Value getValue(int row, int col) {
         return rows.get(row).get(col);
     }
-    
+
     /**
-     * For setting a value. 
+     * For setting a value.
+     *
      * @param row The row index of the value to set.
      * @param col The column index of the value to set.
      * @param v The value to set.
@@ -102,17 +108,17 @@ public class Columns extends Category {
         rows.get(row).set(col, v);
         cols.get(col).values.set(row, v);
     }
-    
+
     /**
-     * @return The maximum token length for all DataItems in {@link #variables}. 
+     * @return The maximum token length for all DataItems in {@link #variables}.
      */
     public int getTokenMaxLength() {
         OptionalInt o = cols.stream().map(Variable::getToken)
-                            .mapToInt(String::length)
-                            .max();
+                .mapToInt(String::length)
+                .max();
         return o.orElse(-1); // Return value held by o, or -1 if there is no value.
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
