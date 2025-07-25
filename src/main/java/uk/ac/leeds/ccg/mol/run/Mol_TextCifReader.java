@@ -16,11 +16,14 @@
 package uk.ac.leeds.ccg.mol.run;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import uk.ac.leeds.ccg.data.format.Data_ReadCSV;
 import uk.ac.leeds.ccg.generic.core.Generic_Environment;
 import uk.ac.leeds.ccg.generic.io.Generic_Defaults;
@@ -125,7 +128,7 @@ public class Mol_TextCifReader {
     protected Data_ReadCSV reader;
 
     protected CIF cif;
-    
+
     public final HashMap<Integer, String> padding;
 
     /**
@@ -134,13 +137,14 @@ public class Mol_TextCifReader {
     public Mol_TextCifReader() {
         padding = new HashMap<>();
         String s = "";
-        for (int i = 0; i < 80; i ++) {
+        for (int i = 0; i < 80; i++) {
             padding.put(i, s);
             s += Mol_Strings.symbol_space;
         }
     }
 
     public static void main(String[] args) {
+        
         Mol_TextCifReader ex = new Mol_TextCifReader();
         try {
             //String pdbId = "4ug0";
@@ -163,18 +167,22 @@ public class Mol_TextCifReader {
 //            }
 //            // fine-grained options are available in the CifOptions class
 
-            Path p = Paths.get("C:", "Users", "geoagdt", "Downloads", "6xu8.cif");
+            String code = "6xu8";
+            Path dir = Paths.get("C:", "Users", "geoagdt", "Downloads");
+            Path p = Paths.get(dir.toString(), code + ".cif");
+
+            // Read data
+            // Set up reader
             BufferedReader br = Generic_IO.getBufferedReader(p);
             Generic_Files files = new Generic_Files(new Generic_Defaults());
             Mol_Environment env = new Mol_Environment(new Generic_Environment(files));
             ex.reader = new Data_ReadCSV(env);
             ex.reader.setStreamTokenizer(br, 10);
-
+            // Initialise in memory store
             ex.cif = new CIF(env);
-
             DataBlock db = null;
             String line = ex.reader.readLine();
-            System.out.println(line);
+            //System.out.println(line);
             while (line != null) {
                 if (line.startsWith(Mol_Strings.SYMBOL_HASH)) {
                     ex.cif.comments.add(new Comment(line.split(Mol_Strings.SYMBOL_HASH)[1]));
@@ -203,7 +211,7 @@ public class Mol_TextCifReader {
                             String value = "";
                             if (values.size() == 1) {
                                 line = ex.reader.readLine();
-                                System.out.println(line);
+                                //System.out.println(line);
                                 if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
                                     value += line.trim().substring(1);
                                 } else {
@@ -216,56 +224,92 @@ public class Mol_TextCifReader {
                             }
                             dataItems.dataItems.put(dataItems.getNextDataItem_ID(), new DataItem(dataItems, vname, value));
                         } else {
-                            if (! line.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                            if (!line.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
                                 int debug = 1;
                             }
                         }
                     }
                 }
                 line = ex.reader.readLine();
-                System.out.println(line);
+                //System.out.println(line);
             }
 
-            // Try to write out from the in memory representation.
+            // Print/write from the in memory representation.
+            // Set up writer
+            Path outp = Paths.get(dir.toString(), code + ".cif2");
+            BufferedWriter bw = Generic_IO.getBufferedWriter(outp, false);
+            
             ex.cif.dataBlocks.stream().forEach(x -> {
-                x.columnsAndDataItems.forEach(y -> {
-                    System.out.println(Mol_Strings.SYMBOL_HASH);                        
-                    if (y instanceof Columns_ID id) {
-                        System.out.println(Mol_Strings.s_loop_);
-                        Columns columns = x.getColumns(id);
-                        // Header
-                        columns.cols.forEach(z -> {
-                            System.out.println(columns.name + Mol_Strings.symbol_dot + z.name);
-                        });
-                        // Values
-                        int nrows = columns.getNRows();
-                        int ncols = columns.getNCols();
-                        for (int r = 0; r < nrows; r ++) {
-                            StringBuilder sb = new StringBuilder();
-                            for (int c = 0; c < ncols; c ++) {
-                                Column col = columns.cols.get(c);
-                                int w = col.getWidth();
-                                Value v = columns.getValue(r, c);
-                                String s = v.v;
-                                int sw = s.length();
-                                String pad = ex.padding.get(w - sw + 1);
-                                sb.append(s);
-                                sb.append(pad);
+                try {
+                    String s0 = x.dbh + Mol_Environment.EOL;
+                    //System.out.print(s0);
+                    bw.write(s0);
+                    x.columnsAndDataItems.forEach(y -> {
+                        try {
+                            String s1 = Mol_Strings.SYMBOL_HASH + Mol_Environment.EOL;
+                            //System.out.print(s);
+                            bw.write(s1);
+                            if (y instanceof Columns_ID id) {
+                                s1 = Mol_Strings.s_loop_ + Mol_Environment.EOL;
+                                //System.out.print(s);
+                                bw.write(s1);
+                                Columns columns = x.getColumns(id);
+                                // Header
+                                columns.cols.forEach(z -> {
+                                    try {
+                                        String s2 = Mol_Strings.symbol_underscore
+                                                + columns.name + Mol_Strings.symbol_dot
+                                                + z.name + Mol_Environment.EOL;
+                                        //System.out.print(s2);
+                                        bw.write(s2);
+                                    } catch (IOException ex1) {
+                                        Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                                    }
+                                });
+                                // Values
+                                int nrows = columns.getNRows();
+                                int ncols = columns.getNCols();
+                                for (int r = 0; r < nrows; r++) {
+                                    StringBuilder sb = new StringBuilder();
+                                    for (int c = 0; c < ncols; c++) {
+                                        Column col = columns.cols.get(c);
+                                        int w = col.getWidth();
+                                        Value v = columns.getValue(r, c);
+                                        int sw = v.v.length();
+                                        String pad = ex.padding.get(w - sw + 1);
+                                        sb.append(v.v);
+                                        sb.append(pad);
+                                    }
+                                    String s2 = sb.toString() + Mol_Environment.EOL;
+                                    //System.out.print(s2);
+                                    bw.write(s2);
+                                }
+                            } else {
+                                DataItems dataItems = x.getDataItems((DataItems_ID) y);
+                                int nml = dataItems.getNameMaxLength();
+                                dataItems.dataItems.values().forEach(z -> {
+                                    try {
+                                        String pad = ex.padding.get(nml - z.name.length() + 3);
+                                        String s2 = Mol_Strings.symbol_underscore
+                                                + dataItems.name + Mol_Strings.symbol_dot
+                                                + z.name + pad + z.value + Mol_Environment.EOL;
+                                        //System.out.print(s2);
+                                        bw.write(s2);
+                                    } catch (IOException ex1) {
+                                        Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                                    }
+                                });
                             }
-                            System.out.println(sb.toString());                            
+                        } catch (IOException ex1) {
+                            Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
                         }
-                    } else {
-                        DataItems dataItems = x.getDataItems((DataItems_ID) y);
-                        int nml = dataItems.getNameMaxLength();
-                        dataItems.dataItems.values().forEach(z -> {
-                            String pad = ex.padding.get(nml - z.name.length() + 3);
-                            System.out.println(dataItems.name 
-                                    + Mol_Strings.symbol_dot + z.name + pad +
-                                    z.value);
-                        });
-                    }
-                });
+                    });
+                } catch (IOException ex1) {
+                    Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             });
+            bw.close();
+
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -461,7 +505,7 @@ public class Mol_TextCifReader {
     protected void parseLoop(DataBlock db) {
         try {
             String line = reader.readLine();
-            System.out.println(line);
+            //System.out.println(line);
 
             String[] parts = line.split("\\."); // Need to escape the dot
 
@@ -487,7 +531,7 @@ public class Mol_TextCifReader {
 
                 columns.cols.add(new Column(columns, parts[1].trim()));
                 line = reader.readLine();
-                System.out.println(line);
+                //System.out.println(line);
             }
 
             // Add values
@@ -502,15 +546,15 @@ public class Mol_TextCifReader {
                      * line which should start with ";".
                      */
                     String line2 = reader.readLine();
-                    System.out.println(line2);
+                    //System.out.println(line2);
                     if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
                         if (columns.cols.get(values.size()).name.equalsIgnoreCase("name")) {
                             values.add(line2.substring(1)); // Strip off the semi-colon.
                             String line3 = reader.readLine();
-                            System.out.println(line3);
+                            //System.out.println(line3);
                             if (line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
                                 String line4 = reader.readLine();
-                                System.out.println(line4);
+                                //System.out.println(line4);
                                 values.addAll(getValues(line4));
 
                                 if (values.size() != columns.cols.size()) {
@@ -527,7 +571,7 @@ public class Mol_TextCifReader {
                             values.add(sb2.toString());
                         } else {
                             String line3 = reader.readLine().trim();
-                            System.out.println(line3);
+                            //System.out.println(line3);
                             values.add(line3);
                         }
                     } else {
@@ -540,8 +584,8 @@ public class Mol_TextCifReader {
                 }
                 columns.addRow(values);
                 line = reader.readLine();
-                System.out.println(line);
-                row ++;                
+                //System.out.println(line);
+                row++;
             }
 
         } catch (Exception e) {
@@ -552,11 +596,11 @@ public class Mol_TextCifReader {
 
     protected void readMultiLine(StringBuilder sb) throws IOException {
         String line = reader.readLine().trim();
-        System.out.println(line);
+        //System.out.println(line);
         while (!line.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
             sb.append(line);
             line = reader.readLine().trim();
-            System.out.println(line);
+            //System.out.println(line);
         }
     }
 
