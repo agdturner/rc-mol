@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.cif.data_items;
+
+//import uk.ac.leeds.ccg.mol.data.cif.Category;
+import uk.ac.leeds.ccg.mol.data.cif.DataItems;
+import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
+import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 
 /**
- * Category class.
+ * Entry DataItems.
  * @author Andy Turner
  */
-public class Category {
+public class Entry extends DataItems {
     
     /**
-     * The name.
+     * "entry"
      */
-    public final String name;
+    public static String NAME = "entry";
     
     /**
      * Create a new instance.
-     * 
-     * @param name What {@link name} is set to.
      */
-    public Category(String name){
-        this.name = name;
+    public Entry(DataItems_ID id) {
+        super(NAME, id);
     }
     
 }

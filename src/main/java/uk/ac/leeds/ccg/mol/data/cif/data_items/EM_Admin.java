@@ -13,43 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.cif.data_items;
+
+import uk.ac.leeds.ccg.mol.data.cif.DataItems;
+import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
 
 /**
- * DataItems_ID class.
+ * EM_Admin DataItems.
  * @author Andy Turner
  */
-public class DataItems_ID extends Category_ID {
-
-    private static final long serialVersionUID = 1L;
+public class EM_Admin extends DataItems {
+    
+    /**
+     * "em_admin"
+     */
+    public static String NAME = "em_admin";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public DataItems_ID(int id){
-        super(id);
+    public EM_Admin(DataItems_ID id) {
+        super(NAME, id);
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (o != null) {
-            if (o != this) {
-                if (o instanceof DataItems_ID o2) {
-                    if (id == o2.id) {
-                        return true;
-                    }
-                }
-            } else {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
-    }
 }

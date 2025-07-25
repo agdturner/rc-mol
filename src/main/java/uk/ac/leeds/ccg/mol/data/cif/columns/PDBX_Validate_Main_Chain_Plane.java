@@ -13,43 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif;
+package uk.ac.leeds.ccg.mol.data.cif.columns;
+
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 
 /**
- * DataItems_ID class.
+ * PDBX_Validate_Main_Chain_Plane Columns.
  * @author Andy Turner
  */
-public class DataItems_ID extends Category_ID {
-
-    private static final long serialVersionUID = 1L;
+public class PDBX_Validate_Main_Chain_Plane extends Columns {
+    
+    /**
+     * "pdbx_validate_main_chain_plane"
+     */
+    public static String NAME = "pdbx_validate_main_chain_plane";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public DataItems_ID(int id){
-        super(id);
+    public PDBX_Validate_Main_Chain_Plane(Columns_ID id) {
+        super(NAME, id);
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (o != null) {
-            if (o != this) {
-                if (o instanceof DataItems_ID o2) {
-                    if (id == o2.id) {
-                        return true;
-                    }
-                }
-            } else {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
-    }
 }

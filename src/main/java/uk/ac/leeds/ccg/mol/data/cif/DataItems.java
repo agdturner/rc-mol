@@ -15,8 +15,8 @@
  */
 package uk.ac.leeds.ccg.mol.data.cif;
 
-import java.util.ArrayList;
-import java.util.OptionalInt;
+import java.util.HashMap;
+import java.util.Iterator;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
@@ -28,9 +28,14 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 public class DataItems extends Category {
     
     /**
+     * The id.
+     */
+    public final DataItems_ID id;
+    
+    /**
      * DataItems.
      */
-    public ArrayList<DataItem> dataItems;
+    public HashMap<DataItem_ID, DataItem> dataItems;
     
     /**
      * Create a new instance.
@@ -39,7 +44,7 @@ public class DataItems extends Category {
      * @param id What {@link id} is set to.
      */
     public DataItems(String name, DataItems_ID id){
-        this(name, id, new ArrayList<>());
+        this(name, id, new HashMap<>());
     }
     
     /**
@@ -47,29 +52,27 @@ public class DataItems extends Category {
      * 
      * @param name What {@link name} is set to.
      * @param id What {@link id} is set to.
-     * @param rows The data organised as rows of columns.
+     * @param dataItems What {@link #dataItems} is set to.
      */
     public DataItems(String name, DataItems_ID id, 
-            ArrayList<DataItem> dataItems) {
-        super(name, id);
+            HashMap<DataItem_ID, DataItem> dataItems) {
+        super(name);
+        this.id = id;
         this.dataItems = dataItems;
-    }
-    
-    /**
-     * @param s A line of values.
-     */
-    public void addItem(DataItem di) {
-        
     }
     
     /**
      * @return The maximum token length for all DataItems in {@link #variables}. 
      */
-    public int getTokenMaxLength() {
-        OptionalInt o = dataItems.stream().map(Variable::getToken)
-                            .mapToInt(String::length)
-                            .max();
-        return o.orElse(-1); // Return value held by o, or -1 if there is no value.
+    public int getNameMaxLength() {
+        int r = 0;
+        Iterator<DataItem> ite = dataItems.values().iterator();
+        while (ite.hasNext()) {
+            DataItem d = ite.next();
+            String n = d.name;
+            r = Math.max(r, n.length());
+        }
+        return r;
     }
     
     @Override
@@ -77,11 +80,16 @@ public class DataItems extends Category {
         StringBuilder sb = new StringBuilder();
         sb.append(Mol_Strings.s_loop_);
         sb.append(Mol_Environment.EOL);
-        dataItems.forEach(x -> {
+        dataItems.values().forEach(x -> {
             sb.append(x.name);
+            sb.append(Mol_Strings.symbol_space);
             sb.append(x.value);
             sb.append(Mol_Environment.EOL);
         });
         return sb.toString();
+    }
+    
+    public DataItem_ID getNextDataItem_ID() {
+        return new DataItem_ID(dataItems.size());
     }
 }

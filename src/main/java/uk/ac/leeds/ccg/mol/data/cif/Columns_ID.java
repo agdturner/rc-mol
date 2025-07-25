@@ -31,4 +31,26 @@ public class Columns_ID extends Category_ID {
         super(id);
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (o != null) {
+            if (o != this) {
+                if (o instanceof Columns_ID o2) {
+                    if (id == o2.id) {
+                        return true;
+                    }
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+    
 }

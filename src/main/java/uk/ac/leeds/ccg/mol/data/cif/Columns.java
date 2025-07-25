@@ -16,8 +16,6 @@
 package uk.ac.leeds.ccg.mol.data.cif;
 
 import java.util.ArrayList;
-import java.util.OptionalInt;
-import uk.ac.leeds.ccg.data.format.Data_ReadCSV;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
@@ -28,6 +26,11 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
  * @author Andy Turner
  */
 public class Columns extends Category {
+    
+    /**
+     * The id.
+     */
+    public final Columns_ID id;
 
     /**
      * Data in columns.
@@ -37,7 +40,7 @@ public class Columns extends Category {
     /**
      * Data in rows.
      */
-    public ArrayList<ArrayList<Value>> rows;
+    private final ArrayList<ArrayList<Value>> rows;
 
     /**
      * Create a new instance.
@@ -58,7 +61,9 @@ public class Columns extends Category {
      */
     public Columns(String name, Columns_ID id,
             ArrayList<ArrayList<Value>> rows) {
-        super(name, id);
+        super(name);
+        this.id = id;
+        this.rows = rows;
         int nrows = rows.size();
         if (nrows > 0) {
             int ncols = rows.get(0).size();
@@ -76,13 +81,16 @@ public class Columns extends Category {
     }
 
     /**
-     * @param s A line of values.
+     * @param values The values to add.
      */
-    public void addRow(String s) {
-        ArrayList<String> values = Data_ReadCSV.parseLine(s, ' ');
+    public void addRow(ArrayList<String> values) {
         int row = rows.size();
         for (int col = 0; col < values.size(); col++) {
-            setValue(row, col, new Value(values.get(col)));
+            Value v = new Value(values.get(col));
+            // Add value to column
+            cols.get(col).values.add(v);
+            // Add value to data organised in rows.
+            setValue(row, col, v);
         }
     }
 
@@ -105,18 +113,28 @@ public class Columns extends Category {
      * @param v The value to set.
      */
     public void setValue(int row, int col, Value v) {
+        while (rows.size() <= row) {
+            rows.add(new ArrayList<>());
+        }
+        while (rows.get(row).size() <= col) {
+            rows.get(row).add(new Value(""));
+        }
         rows.get(row).set(col, v);
         cols.get(col).values.set(row, v);
     }
-
+    
     /**
-     * @return The maximum token length for all DataItems in {@link #variables}.
+     * @return The number of columns. 
      */
-    public int getTokenMaxLength() {
-        OptionalInt o = cols.stream().map(Variable::getToken)
-                .mapToInt(String::length)
-                .max();
-        return o.orElse(-1); // Return value held by o, or -1 if there is no value.
+    public int getNCols() {
+        return cols.size();
+    }
+    
+    /**
+     * @return The number of rows. 
+     */
+    public int getNRows() {
+        return rows.size();
     }
 
     @Override

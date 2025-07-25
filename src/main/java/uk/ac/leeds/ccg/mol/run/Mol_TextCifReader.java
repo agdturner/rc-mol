@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import uk.ac.leeds.ccg.data.format.Data_ReadCSV;
-import uk.ac.leeds.ccg.data.format.Data_ReadTXT;
 import uk.ac.leeds.ccg.generic.core.Generic_Environment;
 import uk.ac.leeds.ccg.generic.io.Generic_Defaults;
 import uk.ac.leeds.ccg.generic.io.Generic_Files;
@@ -29,94 +29,92 @@ import uk.ac.leeds.ccg.generic.io.Generic_IO;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
-import uk.ac.leeds.ccg.mol.data.cif.Category;
-import uk.ac.leeds.ccg.mol.data.cif.Category_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Column;
-import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Columns;
 import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Comment;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlock;
 import uk.ac.leeds.ccg.mol.data.cif.DataBlockHeading;
 import uk.ac.leeds.ccg.mol.data.cif.DataItem;
+import uk.ac.leeds.ccg.mol.data.cif.DataItems;
 import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Variable_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Value;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Site;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Atom_Sites;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Audit_Author;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Audit_Conform;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Cell;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp_Atom;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Chem_Comp_Bond;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Citation_Author;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Database_2;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_3D_Fitting;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_3D_Reconstruction;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Admin;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Buffer;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_CTF_Correction;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_Molwt;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Entity_Assembly_NaturalSource;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Experiment;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Image_Processing;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Image_Recording;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Imaging;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Single_Particle_Entity;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Software;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Specimen;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.EM_Vitrification;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Name_Com;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Poly;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Poly_Seq;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entity_Src_Nat;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Entry;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Exptl;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_Conf_NA;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_NA_Base_Pair;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.NDB_Struct_NA_Base_Pair_Step;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Category;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Details;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Group;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_History;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Revision_Item;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Audit_Support;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Related;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Database_Status;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Poly_Seq_Scheme;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Auth_Evidence;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Assembly_Gen;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Oper_List;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Struct_Sheet_Hbond;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Unobs_or_Zero_Occ_Atoms;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Close_Contact;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Main_Chain_Plane;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Peptide_Omega;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Polymer_Linkage;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Angle;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_RMSD_Bond;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.PDBX_Validate_Torsion;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Asym;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conf_Type;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conn;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Conn_Type;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Keywords;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Mon_Prot_Cis;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref_Seq;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Ref_Seq_Dif;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet_Order;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Struct_Sheet_Range;
-import uk.ac.leeds.ccg.mol.data.mmcif.category.Symmetry;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Atom_Site;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Atom_Sites;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Audit_Author;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Audit_Conform;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Cell;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Chem_Comp;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Chem_Comp_Atom;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Chem_Comp_Bond;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Citation;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Citation_Author;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Database_2;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_3D_Fitting;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_3D_Reconstruction;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Admin;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Buffer;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_CTF_Correction;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Entity_Assembly;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Entity_Assembly_Molwt;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Entity_Assembly_NaturalSource;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Experiment;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Image_Processing;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Image_Recording;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Imaging;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Single_Particle_Entity;
+import uk.ac.leeds.ccg.mol.data.cif.columns.EM_Software;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Specimen;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Vitrification;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Name_Com;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Poly;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Poly_Seq;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Src_Nat;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Entry;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Exptl;
+import uk.ac.leeds.ccg.mol.data.cif.columns.NDB_Struct_Conf_NA;
+import uk.ac.leeds.ccg.mol.data.cif.columns.NDB_Struct_NA_Base_Pair;
+import uk.ac.leeds.ccg.mol.data.cif.columns.NDB_Struct_NA_Base_Pair_Step;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Audit_Revision_Category;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Audit_Revision_Details;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Audit_Revision_Group;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Audit_Revision_History;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Audit_Revision_Item;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Audit_Support;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Database_Related;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Database_Status;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Poly_Seq_Scheme;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Struct_Assembly;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Struct_Assembly_Auth_Evidence;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Struct_Assembly_Gen;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Struct_Oper_List;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Struct_Sheet_Hbond;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Unobs_or_Zero_Occ_Atoms;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_Close_Contact;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_Main_Chain_Plane;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Validate_Peptide;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_Peptide_Omega;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_Polymer_Linkage;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_RMSD_Angle;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_RMSD_Bond;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Validate_Torsion;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Struct;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Asym;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Conf;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Struct_Conf_Type;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Conn;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Struct_Conn_Type;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Struct_Keywords;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Mon_Prot_Cis;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Ref;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Ref_Seq;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Ref_Seq_Dif;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Range;
+import uk.ac.leeds.ccg.mol.data.cif.data_items.Symmetry;
 
 /**
  *
@@ -124,14 +122,22 @@ import uk.ac.leeds.ccg.mol.data.mmcif.category.Symmetry;
  */
 public class Mol_TextCifReader {
 
-    protected Data_ReadTXT reader;
+    protected Data_ReadCSV reader;
 
     protected CIF cif;
+    
+    public final HashMap<Integer, String> padding;
 
     /**
      * Create a new instance.
      */
     public Mol_TextCifReader() {
+        padding = new HashMap<>();
+        String s = "";
+        for (int i = 0; i < 80; i ++) {
+            padding.put(i, s);
+            s += Mol_Strings.symbol_space;
+        }
     }
 
     public static void main(String[] args) {
@@ -161,7 +167,7 @@ public class Mol_TextCifReader {
             BufferedReader br = Generic_IO.getBufferedReader(p);
             Generic_Files files = new Generic_Files(new Generic_Defaults());
             Mol_Environment env = new Mol_Environment(new Generic_Environment(files));
-            ex.reader = new Data_ReadTXT(env);
+            ex.reader = new Data_ReadCSV(env);
             ex.reader.setStreamTokenizer(br, 10);
 
             ex.cif = new CIF(env);
@@ -184,203 +190,267 @@ public class Mol_TextCifReader {
                     } else {
                         // DataItemss
                         if (line.startsWith(Mol_Strings.symbol_underscore)) {
-                            String[] parts = line.split("\\."); // Need to escape the dot
-                            String categoryName = parts[0].substring(1);
-                            Category category = ex.getCategory(categoryName, new DataItems_ID(db.dataItemsId2DataItemsName.size()));
-                            ArrayList<String> nameAndValue = ex.getValues(parts[1]);
-                            ArrayList<DataItem> dataItems = new ArrayList<>();
-                            DataItems_ID id = new DataItems_ID(db.dataItemsId2DataItemsName.size());
-                            db.dataItemsName2DataItemsId.put(nameAndValue.get(0), id);
-                            db.dataItemsId2DataItemsName.put(id, nameAndValue.get(0));
-                            DataItem di;
-                            if (nameAndValue.size() > 2) {
-                                String value = "";
-                                for (int i = 1; i < nameAndValue.size(); i++) {
-                                    value += nameAndValue.get(i);
-                                }
-                                di = new DataItem(category, nameAndValue.get(0), value);
-                            } else if (nameAndValue.size() == 2) {
-                                di = new DataItem(category, nameAndValue.get(0), nameAndValue.get(1));
-                            } else {
+                            ArrayList<String> values = ex.getValues(line);
+                            String[] parts = values.get(0).split("\\."); // Need to escape the dot
+                            String name = parts[0].substring(1);
+                            String vname = parts[1];
+                            DataItems dataItems = db.getDataItems(name);
+                            if (dataItems == null) {
+                                DataItems_ID id = db.getNextDataItems_ID();
+                                dataItems = new DataItems(name, id);
+                                db.addDataItems(dataItems);
+                            }
+                            String value = "";
+                            if (values.size() == 1) {
                                 line = ex.reader.readLine();
                                 System.out.println(line);
                                 if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                                    di = new DataItem(category, nameAndValue.get(0), line.substring(0));
+                                    value += line.trim().substring(1);
                                 } else {
-                                    throw new Exception("Missing value");
+                                    int debug = 1;
+                                }
+                            } else {
+                                for (int i = 1; i < values.size(); i++) {
+                                    value += values.get(i);
                                 }
                             }
-                            dataItems.add(di);
+                            dataItems.dataItems.put(dataItems.getNextDataItem_ID(), new DataItem(dataItems, vname, value));
+                        } else {
+                            if (! line.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                                int debug = 1;
+                            }
                         }
                     }
                 }
                 line = ex.reader.readLine();
                 System.out.println(line);
             }
-            int debug = 1;
+
+            // Try to write out from the in memory representation.
+            ex.cif.dataBlocks.stream().forEach(x -> {
+                x.columnsAndDataItems.forEach(y -> {
+                    System.out.println(Mol_Strings.SYMBOL_HASH);                        
+                    if (y instanceof Columns_ID id) {
+                        System.out.println(Mol_Strings.s_loop_);
+                        Columns columns = x.getColumns(id);
+                        // Header
+                        columns.cols.forEach(z -> {
+                            System.out.println(columns.name + Mol_Strings.symbol_dot + z.name);
+                        });
+                        // Values
+                        int nrows = columns.getNRows();
+                        int ncols = columns.getNCols();
+                        for (int r = 0; r < nrows; r ++) {
+                            StringBuilder sb = new StringBuilder();
+                            for (int c = 0; c < ncols; c ++) {
+                                Column col = columns.cols.get(c);
+                                int w = col.getWidth();
+                                Value v = columns.getValue(r, c);
+                                String s = v.v;
+                                int sw = s.length();
+                                String pad = ex.padding.get(w - sw + 1);
+                                sb.append(s);
+                                sb.append(pad);
+                            }
+                            System.out.println(sb.toString());                            
+                        }
+                    } else {
+                        DataItems dataItems = x.getDataItems((DataItems_ID) y);
+                        int nml = dataItems.getNameMaxLength();
+                        dataItems.dataItems.values().forEach(z -> {
+                            String pad = ex.padding.get(nml - z.name.length() + 3);
+                            System.out.println(dataItems.name 
+                                    + Mol_Strings.symbol_dot + z.name + pad +
+                                    z.value);
+                        });
+                    }
+                });
+            });
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
-    protected Category getCategory(String categoryName, Category_ID id) throws Exception {
-        Category c;
-        if (categoryName.equalsIgnoreCase(Entry.NAME)) {
-            c = new Entry(id);
-        } else if (categoryName.equalsIgnoreCase(Audit_Conform.NAME)) {
-            c = new Audit_Conform(id);
-        } else if (categoryName.equalsIgnoreCase(Database_2.NAME)) {
-            c = new Database_2(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_History.NAME)) {
-            c = new PDBX_Audit_Revision_History(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Details.NAME)) {
-            c = new PDBX_Audit_Revision_Details(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Group.NAME)) {
-            c = new PDBX_Audit_Revision_Group(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Category.NAME)) {
-            c = new PDBX_Audit_Revision_Category(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Revision_Item.NAME)) {
-            c = new PDBX_Audit_Revision_Item(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Status.NAME)) {
-            c = new PDBX_Database_Status(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Database_Related.NAME)) {
-            c = new PDBX_Database_Related(id);
-        } else if (categoryName.equalsIgnoreCase(Audit_Author.NAME)) {
-            c = new Audit_Author(id);
-        } else if (categoryName.equalsIgnoreCase(Citation.NAME)) {
-            c = new Citation(id);
-        } else if (categoryName.equalsIgnoreCase(Citation_Author.NAME)) {
-            c = new Citation_Author(id);
-        } else if (categoryName.equalsIgnoreCase(Entity.NAME)) {
-            c = new Entity(id);
-        } else if (categoryName.equalsIgnoreCase(Entity_Name_Com.NAME)) {
-            c = new Entity_Name_Com(id);
-        } else if (categoryName.equalsIgnoreCase(Entity_Poly.NAME)) {
-            c = new Entity_Poly(id);
-        } else if (categoryName.equalsIgnoreCase(Entity_Poly_Seq.NAME)) {
-            c = new Entity_Poly_Seq(id);
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_Conf_NA.NAME)) {
-            c = new NDB_Struct_Conf_NA(id);
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair.NAME)) {
-            c = new NDB_Struct_NA_Base_Pair(id);
-        } else if (categoryName.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.NAME)) {
-            c = new NDB_Struct_NA_Base_Pair_Step(id);
-
-        } else if (categoryName.equalsIgnoreCase(Entity_Src_Nat.NAME)) {
-            c = new Entity_Src_Nat(id);
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp.NAME)) {
-            c = new Chem_Comp(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Poly_Seq_Scheme.NAME)) {
-            c = new PDBX_Poly_Seq_Scheme(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Unobs_or_Zero_Occ_Atoms.NAME)) {
-            c = new PDBX_Unobs_or_Zero_Occ_Atoms(id);
-        } else if (categoryName.equalsIgnoreCase(Cell.NAME)) {
-            c = new Cell(id);
-        } else if (categoryName.equalsIgnoreCase(Symmetry.NAME)) {
-            c = new Symmetry(id);
-        } else if (categoryName.equalsIgnoreCase(Exptl.NAME)) {
-            c = new Exptl(id);
-        } else if (categoryName.equalsIgnoreCase(Struct.NAME)) {
-            c = new Struct(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Keywords.NAME)) {
-            c = new Struct_Keywords(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Asym.NAME)) {
-            c = new Struct_Asym(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref.NAME)) {
-            c = new Struct_Ref(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq.NAME)) {
-            c = new Struct_Ref_Seq(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Ref_Seq_Dif.NAME)) {
-            c = new Struct_Ref_Seq_Dif(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly.NAME)) {
-            c = new PDBX_Struct_Assembly(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.NAME)) {
-            c = new PDBX_Struct_Assembly_Gen(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Assembly_Auth_Evidence.NAME)) {
-            c = new PDBX_Struct_Assembly_Auth_Evidence(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Oper_List.NAME)) {
-            c = new PDBX_Struct_Oper_List(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Conf.NAME)) {
-            c = new Struct_Conf(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Conf_Type.NAME)) {
-            c = new Struct_Conf_Type(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Conn.NAME)) {
-            c = new Struct_Conn(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Conn_Type.NAME)) {
-            c = new Struct_Conn_Type(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Mon_Prot_Cis.NAME)) {
-            c = new Struct_Mon_Prot_Cis(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet.NAME)) {
-            c = new Struct_Sheet(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Order.NAME)) {
-            c = new Struct_Sheet_Order(id);
-        } else if (categoryName.equalsIgnoreCase(Struct_Sheet_Range.NAME)) {
-            c = new Struct_Sheet_Range(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Struct_Sheet_Hbond.NAME)) {
-            c = new PDBX_Struct_Sheet_Hbond(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Close_Contact.NAME)) {
-            c = new PDBX_Validate_Close_Contact(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Bond.NAME)) {
-            c = new PDBX_Validate_RMSD_Bond(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.NAME)) {
-            c = new PDBX_Validate_RMSD_Angle(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Torsion.NAME)) {
-            c = new PDBX_Validate_Torsion(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide.NAME)) {
-            c = new PDBX_Validate_Peptide(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Peptide_Omega.NAME)) {
-            c = new PDBX_Validate_Peptide_Omega(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.NAME)) {
-            c = new PDBX_Validate_Main_Chain_Plane(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Validate_Polymer_Linkage.NAME)) {
-            c = new PDBX_Validate_Polymer_Linkage(id);
-        } else if (categoryName.equalsIgnoreCase(EM_3D_Fitting.NAME)) {
-            c = new EM_3D_Fitting(id);
-        } else if (categoryName.equalsIgnoreCase(EM_3D_Reconstruction.NAME)) {
-            c = new EM_3D_Reconstruction(id);
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Atom.NAME)) {
-            c = new Chem_Comp_Atom(id);
-        } else if (categoryName.equalsIgnoreCase(Chem_Comp_Bond.NAME)) {
-            c = new Chem_Comp_Bond(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Admin.NAME)) {
-            c = new EM_Admin(id);
-        } else if (categoryName.equalsIgnoreCase(EM_CTF_Correction.NAME)) {
-            c = new EM_CTF_Correction(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_Molwt.NAME)) {
-            c = new EM_Entity_Assembly_Molwt(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.NAME)) {
-            c = new EM_Entity_Assembly_NaturalSource(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Image_Processing.NAME)) {
-            c = new EM_Image_Processing(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Image_Recording.NAME)) {
-            c = new EM_Image_Recording(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Software.NAME)) {
-            c = new EM_Software(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Specimen.NAME)) {
-            c = new EM_Specimen(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Buffer.NAME)) {
-            c = new EM_Buffer(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Entity_Assembly.NAME)) {
-            c = new EM_Entity_Assembly(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Imaging.NAME)) {
-            c = new EM_Imaging(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Vitrification.NAME)) {
-            c = new EM_Vitrification(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Experiment.NAME)) {
-            c = new EM_Experiment(id);
-        } else if (categoryName.equalsIgnoreCase(EM_Single_Particle_Entity.NAME)) {
-            c = new EM_Single_Particle_Entity(id);
-        } else if (categoryName.equalsIgnoreCase(PDBX_Audit_Support.NAME)) {
-            c = new PDBX_Audit_Support(id);
-        } else if (categoryName.equalsIgnoreCase(Atom_Sites.NAME)) {
-            c = new Atom_Sites(id);
-        } else if (categoryName.equalsIgnoreCase(Atom_Site.NAME)) {
-            c = new Atom_Site(id);
-
+    /**
+     * For initialising a DataItems instance using the given parameters.
+     *
+     * @param name The DataItems name.
+     * @param id The DataItems_ID
+     * @return a new DataItems.
+     * @throws Exception if name not recognised.
+     */
+    protected DataItems getDataItems(String name, DataItems_ID id) throws Exception {
+        DataItems r;
+        if (name.equalsIgnoreCase(Entry.NAME)) {
+            r = new Entry(id);
+        } else if (name.equalsIgnoreCase(Audit_Conform.NAME)) {
+            r = new Audit_Conform(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Revision_Details.NAME)) {
+            r = new PDBX_Audit_Revision_Details(id);
+        } else if (name.equalsIgnoreCase(PDBX_Database_Status.NAME)) {
+            r = new PDBX_Database_Status(id);
+        } else if (name.equalsIgnoreCase(PDBX_Database_Related.NAME)) {
+            r = new PDBX_Database_Related(id);
+        } else if (name.equalsIgnoreCase(Citation.NAME)) {
+            r = new Citation(id);
+        } else if (name.equalsIgnoreCase(Cell.NAME)) {
+            r = new Cell(id);
+        } else if (name.equalsIgnoreCase(Symmetry.NAME)) {
+            r = new Symmetry(id);
+        } else if (name.equalsIgnoreCase(Exptl.NAME)) {
+            r = new Exptl(id);
+        } else if (name.equalsIgnoreCase(Struct.NAME)) {
+            r = new Struct(id);
+        } else if (name.equalsIgnoreCase(Struct_Keywords.NAME)) {
+            r = new Struct_Keywords(id);
+        } else if (name.equalsIgnoreCase(PDBX_Struct_Assembly.NAME)) {
+            r = new PDBX_Struct_Assembly(id);
+        } else if (name.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.NAME)) {
+            r = new PDBX_Struct_Assembly_Gen(id);
+        } else if (name.equalsIgnoreCase(PDBX_Struct_Assembly_Auth_Evidence.NAME)) {
+            r = new PDBX_Struct_Assembly_Auth_Evidence(id);
+        } else if (name.equalsIgnoreCase(PDBX_Struct_Oper_List.NAME)) {
+            r = new PDBX_Struct_Oper_List(id);
+        } else if (name.equalsIgnoreCase(Struct_Conf_Type.NAME)) {
+            r = new Struct_Conf_Type(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Peptide.NAME)) {
+            r = new PDBX_Validate_Peptide(id);
+        } else if (name.equalsIgnoreCase(Struct_Conn_Type.NAME)) {
+            r = new Struct_Conn_Type(id);
+        } else if (name.equalsIgnoreCase(EM_3D_Fitting.NAME)) {
+            r = new EM_3D_Fitting(id);
+        } else if (name.equalsIgnoreCase(EM_3D_Reconstruction.NAME)) {
+            r = new EM_3D_Reconstruction(id);
+        } else if (name.equalsIgnoreCase(EM_Admin.NAME)) {
+            r = new EM_Admin(id);
+        } else if (name.equalsIgnoreCase(EM_CTF_Correction.NAME)) {
+            r = new EM_CTF_Correction(id);
+        } else if (name.equalsIgnoreCase(EM_Entity_Assembly_Molwt.NAME)) {
+            r = new EM_Entity_Assembly_Molwt(id);
+        } else if (name.equalsIgnoreCase(EM_Entity_Assembly_NaturalSource.NAME)) {
+            r = new EM_Entity_Assembly_NaturalSource(id);
+        } else if (name.equalsIgnoreCase(EM_Image_Processing.NAME)) {
+            r = new EM_Image_Processing(id);
+        } else if (name.equalsIgnoreCase(EM_Image_Recording.NAME)) {
+            r = new EM_Image_Recording(id);
+        } else if (name.equalsIgnoreCase(EM_Specimen.NAME)) {
+            r = new EM_Specimen(id);
+        } else if (name.equalsIgnoreCase(EM_Buffer.NAME)) {
+            r = new EM_Buffer(id);
+        } else if (name.equalsIgnoreCase(EM_Entity_Assembly.NAME)) {
+            r = new EM_Entity_Assembly(id);
+        } else if (name.equalsIgnoreCase(EM_Imaging.NAME)) {
+            r = new EM_Imaging(id);
+        } else if (name.equalsIgnoreCase(EM_Vitrification.NAME)) {
+            r = new EM_Vitrification(id);
+        } else if (name.equalsIgnoreCase(EM_Experiment.NAME)) {
+            r = new EM_Experiment(id);
+        } else if (name.equalsIgnoreCase(EM_Single_Particle_Entity.NAME)) {
+            r = new EM_Single_Particle_Entity(id);
+        } else if (name.equalsIgnoreCase(Atom_Sites.NAME)) {
+            r = new Atom_Sites(id);
+        } else if (name.equalsIgnoreCase(Atom_Sites.NAME)) {
+            r = new Atom_Site(id);
         } else {
-            throw new Exception("Unrecognised category name");
+            throw new Exception("Unrecognised DataItems name " + name);
         }
-        return c;
+        return r;
+    }
+
+    /**
+     * For initialising a Columns instance using the given parameters.
+     *
+     * @param name The Columns name.
+     * @param id The Columns_ID
+     * @return A new Columns.
+     * @throws Exception if name not recognised.
+     */
+    protected Columns getColumns(String name, Columns_ID id) throws Exception {
+        Columns r;
+        if (name.equalsIgnoreCase(Database_2.NAME)) {
+            r = new Database_2(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Revision_History.NAME)) {
+            r = new PDBX_Audit_Revision_History(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Revision_Group.NAME)) {
+            r = new PDBX_Audit_Revision_Group(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Revision_Category.NAME)) {
+            r = new PDBX_Audit_Revision_Category(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Revision_Item.NAME)) {
+            r = new PDBX_Audit_Revision_Item(id);
+        } else if (name.equalsIgnoreCase(Audit_Author.NAME)) {
+            r = new Audit_Author(id);
+        } else if (name.equalsIgnoreCase(Citation_Author.NAME)) {
+            r = new Citation_Author(id);
+        } else if (name.equalsIgnoreCase(Entity.NAME)) {
+            r = new Entity(id);
+        } else if (name.equalsIgnoreCase(Entity_Name_Com.NAME)) {
+            r = new Entity_Name_Com(id);
+        } else if (name.equalsIgnoreCase(Entity_Poly.NAME)) {
+            r = new Entity_Poly(id);
+        } else if (name.equalsIgnoreCase(Entity_Poly_Seq.NAME)) {
+            r = new Entity_Poly_Seq(id);
+        } else if (name.equalsIgnoreCase(Entity_Src_Nat.NAME)) {
+            r = new Entity_Src_Nat(id);
+        } else if (name.equalsIgnoreCase(Chem_Comp.NAME)) {
+            r = new Chem_Comp(id);
+        } else if (name.equalsIgnoreCase(PDBX_Poly_Seq_Scheme.NAME)) {
+            r = new PDBX_Poly_Seq_Scheme(id);
+        } else if (name.equalsIgnoreCase(PDBX_Unobs_or_Zero_Occ_Atoms.NAME)) {
+            r = new PDBX_Unobs_or_Zero_Occ_Atoms(id);
+        } else if (name.equalsIgnoreCase(Struct_Asym.NAME)) {
+            r = new Struct_Asym(id);
+        } else if (name.equalsIgnoreCase(Struct_Ref.NAME)) {
+            r = new Struct_Ref(id);
+        } else if (name.equalsIgnoreCase(Struct_Ref_Seq.NAME)) {
+            r = new Struct_Ref_Seq(id);
+        } else if (name.equalsIgnoreCase(Struct_Ref_Seq_Dif.NAME)) {
+            r = new Struct_Ref_Seq_Dif(id);
+        } else if (name.equalsIgnoreCase(Struct_Conf.NAME)) {
+            r = new Struct_Conf(id);
+        } else if (name.equalsIgnoreCase(Struct_Conn.NAME)) {
+            r = new Struct_Conn(id);
+        } else if (name.equalsIgnoreCase(Struct_Mon_Prot_Cis.NAME)) {
+            r = new Struct_Mon_Prot_Cis(id);
+        } else if (name.equalsIgnoreCase(Struct_Sheet.NAME)) {
+            r = new Struct_Sheet(id);
+        } else if (name.equalsIgnoreCase(Struct_Sheet_Order.NAME)) {
+            r = new Struct_Sheet_Order(id);
+        } else if (name.equalsIgnoreCase(Struct_Sheet_Range.NAME)) {
+            r = new Struct_Sheet_Range(id);
+        } else if (name.equalsIgnoreCase(PDBX_Struct_Sheet_Hbond.NAME)) {
+            r = new PDBX_Struct_Sheet_Hbond(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Close_Contact.NAME)) {
+            r = new PDBX_Validate_Close_Contact(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_RMSD_Bond.NAME)) {
+            r = new PDBX_Validate_RMSD_Bond(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_RMSD_Angle.NAME)) {
+            r = new PDBX_Validate_RMSD_Angle(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Torsion.NAME)) {
+            r = new PDBX_Validate_Torsion(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Peptide_Omega.NAME)) {
+            r = new PDBX_Validate_Peptide_Omega(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Main_Chain_Plane.NAME)) {
+            r = new PDBX_Validate_Main_Chain_Plane(id);
+        } else if (name.equalsIgnoreCase(PDBX_Validate_Polymer_Linkage.NAME)) {
+            r = new PDBX_Validate_Polymer_Linkage(id);
+        } else if (name.equalsIgnoreCase(Chem_Comp_Atom.NAME)) {
+            r = new Chem_Comp_Atom(id);
+        } else if (name.equalsIgnoreCase(Chem_Comp_Bond.NAME)) {
+            r = new Chem_Comp_Bond(id);
+        } else if (name.equalsIgnoreCase(EM_Software.NAME)) {
+            r = new EM_Software(id);
+        } else if (name.equalsIgnoreCase(NDB_Struct_Conf_NA.NAME)) {
+            r = new NDB_Struct_Conf_NA(id);
+        } else if (name.equalsIgnoreCase(NDB_Struct_NA_Base_Pair.NAME)) {
+            r = new NDB_Struct_NA_Base_Pair(id);
+        } else if (name.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.NAME)) {
+            r = new NDB_Struct_NA_Base_Pair_Step(id);
+        } else if (name.equalsIgnoreCase(PDBX_Audit_Support.NAME)) {
+            r = new PDBX_Audit_Support(id);
+        } else {
+            throw new Exception("Unrecognised Columns name " + name);
+        }
+        return r;
     }
 
     /**
@@ -405,8 +475,8 @@ public class Mol_TextCifReader {
 
             // Initialise columnss
             Columns columns = new Columns(parts[0].substring(1),
-                    new Columns_ID(db.columnsId2ColumnsName.size()));
-            db.columnss.add(columns);
+                    db.getNextColumns_ID());
+            db.addColumns(columns);
             // Initialise Columns
             while (line.startsWith(Mol_Strings.symbol_underscore)) {
                 parts = line.split("\\."); // Need to escape the dot
@@ -421,6 +491,7 @@ public class Mol_TextCifReader {
             }
 
             // Add values
+            int row = 0;
             while (!(line.startsWith(Mol_Strings.symbol_underscore)
                     || line.startsWith(Mol_Strings.SYMBOL_HASH))) {
                 ArrayList<String> values = getValues(line);
@@ -441,23 +512,23 @@ public class Mol_TextCifReader {
                                 String line4 = reader.readLine();
                                 System.out.println(line4);
                                 values.addAll(getValues(line4));
-                                
+
                                 if (values.size() != columns.cols.size()) {
                                     int debug = 1;
                                 }
-                                
+
                             }
-                        } else if (columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code") || 
-                                columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
-                                StringBuilder sb2 = new StringBuilder(line2.substring(1));
-                                if (!line2.contains("\\s+") && line2.length() == 81) {
-                                    readMultiLine(sb2);
-                                }
-                                values.add(sb2.toString());
+                        } else if (columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code")
+                                || columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
+                            StringBuilder sb2 = new StringBuilder(line2.substring(1));
+                            if (!line2.contains("\\s+") && line2.length() == 81) {
+                                readMultiLine(sb2);
+                            }
+                            values.add(sb2.toString());
                         } else {
                             String line3 = reader.readLine().trim();
                             System.out.println(line3);
-                            values.add(line3);                            
+                            values.add(line3);
                         }
                     } else {
                         // There are cases where there is no line continuation symbol!
@@ -467,13 +538,10 @@ public class Mol_TextCifReader {
                         }
                     }
                 }
-
-                for (int col = 0; col < columns.cols.size(); col++) {
-                    Column column = columns.cols.get(col);
-                    column.values.add(new Value(values.get(col)));
-                }
+                columns.addRow(values);
                 line = reader.readLine();
                 System.out.println(line);
+                row ++;                
             }
 
         } catch (Exception e) {
@@ -481,7 +549,7 @@ public class Mol_TextCifReader {
             e.printStackTrace();
         }
     }
-    
+
     protected void readMultiLine(StringBuilder sb) throws IOException {
         String line = reader.readLine().trim();
         System.out.println(line);

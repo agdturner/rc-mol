@@ -33,66 +33,57 @@ public class DataBlock extends Mol_Object {
      * The DataBlockHeading.
      */
     public DataBlockHeading dbh;
+    
+    /**
+     * This list orders Columns and DataItems. 
+     */
+    public final ArrayList<Category_ID> columnsAndDataItems;
+    
     /**
      * A look up from a Column name to a Column_ID.
      */
-    public HashMap<String, Columns_ID> columnsName2ColumnsId;
+    protected HashMap<String, Columns_ID> columnsName2ColumnsId;
 
     /**
      * A look up from a Column_ID to a Column name.
      */
-    public HashMap<Columns_ID, String> columnsId2ColumnsName;
+    protected HashMap<Columns_ID, String> columnsId2ColumnsName;
     
     /**
      * Columnss
      */
-    public ArrayList<Columns> columnss;
+    protected HashMap<Columns_ID, Columns> columnss;
             
     /**
      * A look up from a DataItem name to a DataItem_ID.
      */
-    public HashMap<String, DataItems_ID> dataItemsName2DataItemsId;
+    protected HashMap<String, DataItems_ID> dataItemsName2DataItemsId;
 
     /**
      * A look up from a DataItem_ID to a DataItem name.
      */
-    public HashMap<DataItems_ID, String> dataItemsId2DataItemsName;
+    protected HashMap<DataItems_ID, String> dataItemsId2DataItemsName;
 
     /**
      * DataItemss
      */
-    public ArrayList<DataItems> dataItemss;
-
-    /**
-     * The SaveFrame
-     */
-    public SaveFrame sf;
-    
-    /**
-     * Create a new instance.
-     * @param env What {@link #env} is set to.
-     * @param dbh What {@link #dbh} is set to.
-     */
-    public DataBlock(Mol_Environment env, DataBlockHeading dbh){
-        this(env, dbh, null);
-    }
+    protected HashMap<DataItems_ID, DataItems> dataItemss;
 
     /**
      * Create a new instance.
      * @param env What {@link #env} is set to.
      * @param dbh What {@link #dbh} is set to.
-     * @param sf What {@link #sf} is set to.
      */
-    public DataBlock(Mol_Environment env, DataBlockHeading dbh, SaveFrame sf) {
+    public DataBlock(Mol_Environment env, DataBlockHeading dbh) {
         super(env);
         this.dbh = dbh;
-        this.sf = sf;
+        columnsAndDataItems = new ArrayList<>();
         columnsName2ColumnsId = new HashMap<>();
         columnsId2ColumnsName = new HashMap<>();
-        columnss = new ArrayList<>();
+        columnss = new HashMap<>();
         dataItemsName2DataItemsId = new HashMap<>();
         dataItemsId2DataItemsName = new HashMap<>();
-        dataItemss = new ArrayList<>();
+        dataItemss = new HashMap<>();
     }
     
     /**
@@ -110,5 +101,71 @@ public class DataBlock extends Mol_Object {
 //        }
         return sb.toString();
     }
+    
+    /**
+     * @param cs The Columns to add.
+     */
+    public void addColumns(Columns cs) {
+        columnsAndDataItems.add(cs.id);
+        columnsId2ColumnsName.put(cs.id, cs.name);
+        columnsName2ColumnsId.put(cs.name, cs.id);
+        columnss.put(cs.id, cs);
+    }
 
+    /**
+     * @param ds The DataItems to add.
+     */
+    public void addDataItems(DataItems ds) {
+        columnsAndDataItems.add(ds.id);
+        dataItemsId2DataItemsName.put(ds.id, ds.name);
+        dataItemsName2DataItemsId.put(ds.name, ds.id);
+        dataItemss.put(ds.id, ds);
+    }
+    
+    /**
+     * @param id The Columns_ID of the Columns to get
+     * @return The Columns with Columns_ID id.
+     */
+    public Columns getColumns(Columns_ID id) {
+        return columnss.get(id);
+    }
+    
+    /**
+     * @param name The name of the Columns to get
+     * @return The Columns with name.
+     */
+    public Columns getColumns(String name) {
+        return columnss.get(columnsName2ColumnsId.get(name));
+    }
+
+    /**
+     * @param id The DataItems_ID of the DataItems to get
+     * @return The DataItems with DataItems_ID id.
+     */
+    public DataItems getDataItems(DataItems_ID id) {
+        return dataItemss.get(id);
+    }
+    
+    /**
+     * @param name The name of the DataItems to get
+     * @return The DataItems with name.
+     */
+    public DataItems getDataItems(String name) {
+        return dataItemss.get(dataItemsName2DataItemsId.get(name));
+    }
+    
+    /**
+     * @return The next Columns_ID.
+     */
+    public Columns_ID getNextColumns_ID() {
+        return new Columns_ID(columnsId2ColumnsName.size());
+    }
+    
+    /**
+     * @return The next DataItems_ID.
+     */
+    public DataItems_ID getNextDataItems_ID() {
+        return new DataItems_ID(dataItemsId2DataItemsName.size());
+    }
+    
 }

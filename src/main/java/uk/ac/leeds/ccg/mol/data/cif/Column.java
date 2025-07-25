@@ -25,6 +25,11 @@ import java.util.ArrayList;
 public class Column extends Variable {
     
     /**
+     * For storing the maximum width of a value.
+     */
+    private Integer w;
+    
+    /**
      * The values. 
      */
     public ArrayList<Value> values;
@@ -39,4 +44,16 @@ public class Column extends Variable {
         this.values = new ArrayList<>();
     }
     
+    /**
+     * @return The maximum text width of {@link #values}.
+     */
+    public int getWidth() {
+        if (w == null) {
+            w = 0;
+            values.forEach(x -> {
+                w = Math.max(w, x.v.length());
+            });
+        }
+        return w;
+    }
 }
