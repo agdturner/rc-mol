@@ -16,6 +16,7 @@
 package uk.ac.leeds.ccg.mol.data.cif;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
@@ -26,7 +27,7 @@ import uk.ac.leeds.ccg.mol.core.Mol_Strings;
  * @author Andy Turner
  */
 public class Columns extends Category {
-    
+
     /**
      * The id.
      */
@@ -35,7 +36,7 @@ public class Columns extends Category {
     /**
      * Data in columns.
      */
-    public ArrayList<Column> cols;
+    public TreeMap<Column_ID, Column> cols;
 
     /**
      * Data in rows.
@@ -65,9 +66,9 @@ public class Columns extends Category {
         this.id = id;
         this.rows = rows;
         int nrows = rows.size();
-        if (nrows > 0) {
+        cols = new TreeMap<>();
+        if (rows.size() > 0) {
             int ncols = rows.get(0).size();
-            cols = new ArrayList<>(ncols);
             for (int row = 0; row < nrows; row++) {
                 ArrayList<Value> values = rows.get(row);
                 for (int col = 0; col < ncols; col++) {
@@ -75,8 +76,6 @@ public class Columns extends Category {
                     c.values.set(col, values.get(col));
                 }
             }
-        } else {
-            cols = new ArrayList<>();
         }
     }
 
@@ -87,10 +86,11 @@ public class Columns extends Category {
         int row = rows.size();
         for (int col = 0; col < values.size(); col++) {
             Value v = new Value(values.get(col));
-            // Add value to column
-            cols.get(col).values.add(v);
+            Column_ID cid = new Column_ID(col); // It would probably be better to look this up rather than create it each time.
             // Add value to data organised in rows.
-            setValue(row, col, v);
+            setValue(row, col, cid, v);
+            // Add value to column.
+            cols.get(cid).values.add(v);
         }
     }
 
@@ -110,9 +110,10 @@ public class Columns extends Category {
      *
      * @param row The row index of the value to set.
      * @param col The column index of the value to set.
+     * @param cid The column id
      * @param v The value to set.
      */
-    public void setValue(int row, int col, Value v) {
+    public void setValue(int row, int col, Column_ID cid, Value v) {
         while (rows.size() <= row) {
             rows.add(new ArrayList<>());
         }
@@ -120,18 +121,22 @@ public class Columns extends Category {
             rows.get(row).add(new Value(""));
         }
         rows.get(row).set(col, v);
-        cols.get(col).values.set(row, v);
+        ArrayList<Value> values = cols.get(cid).values;
+        while (cols.get(cid).values.size() <= row) {
+            cols.get(cid).values.add(new Value(""));
+        }
+        cols.get(cid).values.set(row, v);
     }
-    
+
     /**
-     * @return The number of columns. 
+     * @return The number of columns.
      */
     public int getNCols() {
         return cols.size();
     }
-    
+
     /**
-     * @return The number of rows. 
+     * @return The number of rows.
      */
     public int getNRows() {
         return rows.size();
@@ -142,7 +147,8 @@ public class Columns extends Category {
         StringBuilder sb = new StringBuilder();
         sb.append(Mol_Strings.s_loop_);
         sb.append(Mol_Environment.EOL);
-        cols.forEach(col -> {
+        cols.keySet().forEach(id -> {
+            Column col = cols.get(id);
             sb.append(col.name);
             sb.append(Mol_Environment.EOL);
         });

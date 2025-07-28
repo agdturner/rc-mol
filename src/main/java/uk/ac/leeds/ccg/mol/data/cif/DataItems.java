@@ -17,6 +17,7 @@ package uk.ac.leeds.ccg.mol.data.cif;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 
@@ -35,7 +36,7 @@ public class DataItems extends Category {
     /**
      * DataItems.
      */
-    public HashMap<DataItem_ID, DataItem> dataItems;
+    public TreeMap<DataItem_ID, DataItem> dataItems;
     
     /**
      * Create a new instance.
@@ -44,7 +45,7 @@ public class DataItems extends Category {
      * @param id What {@link id} is set to.
      */
     public DataItems(String name, DataItems_ID id){
-        this(name, id, new HashMap<>());
+        this(name, id, new TreeMap<>());
     }
     
     /**
@@ -55,7 +56,7 @@ public class DataItems extends Category {
      * @param dataItems What {@link #dataItems} is set to.
      */
     public DataItems(String name, DataItems_ID id, 
-            HashMap<DataItem_ID, DataItem> dataItems) {
+            TreeMap<DataItem_ID, DataItem> dataItems) {
         super(name);
         this.id = id;
         this.dataItems = dataItems;
@@ -91,5 +92,12 @@ public class DataItems extends Category {
     
     public DataItem_ID getNextDataItem_ID() {
         return new DataItem_ID(dataItems.size());
+    }
+    
+    /**
+     * @param d The DataItem to add to {@link #dataItems}.
+     */
+    public void add(DataItem d) {
+        dataItems.put(getNextDataItem_ID(), d);
     }
 }

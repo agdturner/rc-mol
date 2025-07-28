@@ -33,6 +33,7 @@ import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
 import uk.ac.leeds.ccg.mol.data.cif.Column;
+import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Columns;
 import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Comment;
@@ -144,7 +145,7 @@ public class Mol_TextCifReader {
     }
 
     public static void main(String[] args) {
-        
+
         Mol_TextCifReader ex = new Mol_TextCifReader();
         try {
             //String pdbId = "4ug0";
@@ -201,6 +202,11 @@ public class Mol_TextCifReader {
                             ArrayList<String> values = ex.getValues(line);
                             String[] parts = values.get(0).split("\\."); // Need to escape the dot
                             String name = parts[0].substring(1);
+
+                            if (name.equalsIgnoreCase(PDBX_Database_Status.NAME)) {
+                                int debug = 1;
+                            }
+
                             String vname = parts[1];
                             DataItems dataItems = db.getDataItems(name);
                             if (dataItems == null) {
@@ -222,7 +228,7 @@ public class Mol_TextCifReader {
                                     value += values.get(i);
                                 }
                             }
-                            dataItems.dataItems.put(dataItems.getNextDataItem_ID(), new DataItem(dataItems, vname, value));
+                            dataItems.add(new DataItem(dataItems, vname, value));
                         } else {
                             if (!line.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
                                 int debug = 1;
@@ -238,7 +244,7 @@ public class Mol_TextCifReader {
             // Set up writer
             Path outp = Paths.get(dir.toString(), code + ".cif2");
             BufferedWriter bw = Generic_IO.getBufferedWriter(outp, false);
-            
+
             ex.cif.dataBlocks.stream().forEach(x -> {
                 try {
                     String s0 = x.dbh + Mol_Environment.EOL;
@@ -246,20 +252,21 @@ public class Mol_TextCifReader {
                     bw.write(s0);
                     x.columnsAndDataItems.forEach(y -> {
                         try {
-                            String s1 = Mol_Strings.SYMBOL_HASH + Mol_Environment.EOL;
-                            //System.out.print(s);
-                            bw.write(s1);
+                            //System.out.println(Mol_Strings.SYMBOL_HASH);
+                            bw.write(Mol_Strings.SYMBOL_HASH);
+                            bw.write(Mol_Environment.EOL);
                             if (y instanceof Columns_ID id) {
-                                s1 = Mol_Strings.s_loop_ + Mol_Environment.EOL;
-                                //System.out.print(s);
-                                bw.write(s1);
+                                //System.out.print(Mol_Strings.s_loop_);
+                                bw.write(Mol_Strings.s_loop_);
+                                bw.write(Mol_Environment.EOL);
                                 Columns columns = x.getColumns(id);
                                 // Header
-                                columns.cols.forEach(z -> {
+                                columns.cols.keySet().forEach(cid -> {
+                                    Column col = columns.cols.get(cid);
                                     try {
                                         String s2 = Mol_Strings.symbol_underscore
                                                 + columns.name + Mol_Strings.symbol_dot
-                                                + z.name + Mol_Environment.EOL;
+                                                + col.name + Mol_Environment.EOL;
                                         //System.out.print(s2);
                                         bw.write(s2);
                                     } catch (IOException ex1) {
@@ -272,46 +279,176 @@ public class Mol_TextCifReader {
                                 for (int r = 0; r < nrows; r++) {
                                     StringBuilder sb = new StringBuilder();
                                     for (int c = 0; c < ncols; c++) {
-                                        Column col = columns.cols.get(c);
-                                        int w = col.getWidth();
+                                        Column_ID cid = new Column_ID(c); // It would probably be better to look this up rather than create it each time.
+                                        Column column = columns.cols.get(cid);
+
+                                        int w = column.getWidth();
                                         Value v = columns.getValue(r, c);
                                         int sw = v.v.length();
                                         String pad = ex.padding.get(w - sw + 1);
-                                        sb.append(v.v);
-                                        sb.append(pad);
+                                        if (pad == null) {
+                                            pad = " ";
+                                        }
+                                        String sbs = sb.toString();
+                                        String[] sbss = sbs.split(Mol_Environment.EOL);
+                                        if (sw > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                            sb.append(Mol_Environment.EOL);
+                                            sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                            String ss = v.v.substring(0, Mol_TextCifWriter.HEADER_LENGTH_MAX);
+                                            sb.append(ss);
+                                            sb.append(Mol_Environment.EOL);
+                                            String sv = v.v.substring(Mol_TextCifWriter.HEADER_LENGTH_MAX, sw);
+                                            while (sv.length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                ss = sv.substring(0, Mol_TextCifWriter.HEADER_LENGTH_MAX);
+                                                sb.append(ss);
+                                                sb.append(Mol_Environment.EOL);
+                                                sv = sv.substring(Mol_TextCifWriter.HEADER_LENGTH_MAX, sv.length());
+                                            }
+                                            sb.append(sv);
+                                            sb.append(Mol_Environment.EOL);
+                                            sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                            if (columns.name.equalsIgnoreCase("struct_ref")) {
+                                                sb.append(Mol_Environment.EOL);
+                                            }
+                                        } else {
+                                            // Handle special cases:
+                                            if (columns.name.equalsIgnoreCase("atom_site")) {
+                                                sb.append(v.v);
+                                            } else if (columns.name.equalsIgnoreCase("ndb_struct_na_base_pair_step") ||
+                                                    columns.name.equalsIgnoreCase("struct_conn")) {
+                                                if (sbss[sbss.length - 1].length() + sw > 130) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                }
+                                                sb.append(v.v);
+                                            } else if (columns.name.equalsIgnoreCase("struct_ref")) {
+                                                if (sw >= Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                    sb.append(v.v);
+                                                    sb.append(Mol_Environment.EOL);
+                                                    sb.append(Mol_Environment.EOL);
+                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                    sb.append(Mol_Environment.EOL);
+                                                } else {
+                                                    sb.append(v.v);
+                                                }
+                                            } else if (columns.name.equalsIgnoreCase("entity_poly")) {
+                                                if (sbss[sbss.length - 1].length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                    if (sw > 10 || sbss[sbss.length - 1].length() > 120) {
+                                                        sb.append(Mol_Environment.EOL);
+                                                    }
+                                                }
+                                                if (column.name.equalsIgnoreCase("pdbx_strand_id")) {
+                                                    if (sw + sbs.length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                        if (sbs.endsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+                                                            sb.append(Mol_Environment.EOL);
+                                                        }
+                                                    }
+                                                }
+                                                sb.append(v.v);
+                                            } else if (columns.name.equalsIgnoreCase("citation_author") && column.name.equalsIgnoreCase("name")) {
+                                                if (!v.v.startsWith("'")) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                    sb.append(v.v);
+                                                    sb.append(Mol_Environment.EOL);
+                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                    sb.append(Mol_Environment.EOL);
+                                                } else {
+                                                    sb.append(v.v);
+                                                }
+                                            } else if (columns.name.equalsIgnoreCase("struct_ref")) {
+                                                if (sbss[sbss.length - 1].length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                    if (sw > 10) {
+                                                        sb.append(Mol_Environment.EOL);
+                                                    }
+                                                }
+                                                sb.append(v.v);
+                                            } else {
+                                                sb.append(v.v);
+                                            }
+                                            if (c < ncols - 1) {
+                                                sb.append(pad);
+                                            }
+                                        }
                                     }
-                                    String s2 = sb.toString() + Mol_Environment.EOL;
-                                    //System.out.print(s2);
-                                    bw.write(s2);
+                                    sb.append(Mol_Environment.EOL);
+                                    //System.out.print(sb.toString());
+                                    bw.write(sb.toString());
                                 }
                             } else {
                                 DataItems dataItems = x.getDataItems((DataItems_ID) y);
                                 int nml = dataItems.getNameMaxLength();
-                                dataItems.dataItems.values().forEach(z -> {
+                                //dataItems.dataItems.values().forEach(z -> {
+                                dataItems.dataItems.keySet().forEach(z -> {
                                     try {
-                                        String pad = ex.padding.get(nml - z.name.length() + 3);
-                                        String s2 = Mol_Strings.symbol_underscore
-                                                + dataItems.name + Mol_Strings.symbol_dot
-                                                + z.name + pad + z.value + Mol_Environment.EOL;
-                                        //System.out.print(s2);
-                                        bw.write(s2);
+                                        DataItem d = dataItems.dataItems.get(z);
+                                        String dv = d.value;
+                                        String pad = ex.padding.get(nml - d.name.length() + 3);
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append(Mol_Strings.symbol_underscore);
+                                        sb.append(dataItems.name);
+                                        sb.append(Mol_Strings.symbol_dot);
+                                        sb.append(d.name);
+                                        // Handle special cases:
+                                        if (dataItems.name.equalsIgnoreCase("em_entity_assembly")) {
+                                            if (sb.toString().length() + pad.length() + dv.length() > 130) {
+                                                sb.append(Mol_Environment.EOL);
+                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                sb.append(dv);
+                                                sb.append(Mol_Environment.EOL);
+                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                sb.append(Mol_Environment.EOL);
+                                            } else {
+                                                sb.append(pad);
+                                                sb.append(dv);
+                                                sb.append(Mol_Environment.EOL);
+                                            }
+                                        } else if (dataItems.name.equalsIgnoreCase("pdbx_struct_assembly_gen")) {
+                                            if (sb.toString().length() + pad.length() + dv.length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
+                                                sb.append(Mol_Environment.EOL);
+                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                sb.append(dv);
+                                                sb.append(Mol_Environment.EOL);
+                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+                                                sb.append(Mol_Environment.EOL);
+                                            } else {
+                                                sb.append(pad);
+                                                sb.append(dv);
+                                                sb.append(Mol_Environment.EOL);
+                                            }
+                                        } else {
+                                            sb.append(pad);
+                                            sb.append(dv);
+                                            sb.append(Mol_Environment.EOL);
+                                        }
+
+                                        //System.out.print(sb.toString());
+                                        bw.write(sb.toString());
                                     } catch (IOException ex1) {
                                         Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                                        ex1.printStackTrace();
                                     }
                                 });
                             }
                         } catch (IOException ex1) {
                             Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                            ex1.printStackTrace();
                         }
                     });
                 } catch (IOException ex1) {
                     Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
+                    ex1.printStackTrace();
                 }
             });
+            //bw.write(Mol_Environment.EOL);
+            bw.write(Mol_Strings.SYMBOL_HASH);
+            //bw.write(Mol_Environment.EOL);
             bw.close();
 
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -529,7 +666,8 @@ public class Mol_TextCifReader {
                     int debug = 1;
                 }
 
-                columns.cols.add(new Column(columns, parts[1].trim()));
+                columns.cols.put(new Column_ID(columns.cols.size()),
+                        new Column(columns, parts[1].trim()));
                 line = reader.readLine();
                 //System.out.println(line);
             }
@@ -548,7 +686,9 @@ public class Mol_TextCifReader {
                     String line2 = reader.readLine();
                     //System.out.println(line2);
                     if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                        if (columns.cols.get(values.size()).name.equalsIgnoreCase("name")) {
+                        Column_ID cid = new Column_ID(values.size());
+                        Column column = columns.cols.get(cid);
+                        if (column.name.equalsIgnoreCase("name")) {
                             values.add(line2.substring(1)); // Strip off the semi-colon.
                             String line3 = reader.readLine();
                             //System.out.println(line3);
@@ -562,8 +702,8 @@ public class Mol_TextCifReader {
                                 }
 
                             }
-                        } else if (columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code")
-                                || columns.cols.get(values.size()).name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
+                        } else if (column.name.equalsIgnoreCase("pdbx_seq_one_letter_code")
+                                || column.name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
                             StringBuilder sb2 = new StringBuilder(line2.substring(1));
                             if (!line2.contains("\\s+") && line2.length() == 81) {
                                 readMultiLine(sb2);
