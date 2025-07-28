@@ -267,6 +267,7 @@ public class Mol_TextCifReader {
                                     try {
                                         writeName(bw, columns.name, col.name);
                                         //System.out.println();
+                                        bw.write(Mol_Strings.symbol_space);
                                         bw.write(Mol_Environment.EOL);
                                     } catch (IOException ex1) {
                                         Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
@@ -299,12 +300,10 @@ public class Mol_TextCifReader {
                                             while (sv.length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
                                                 ss = sv.substring(0, Mol_TextCifWriter.HEADER_LENGTH_MAX);
                                                 sb.append(ss);
-                                                //sb.append(Mol_Strings.symbol_space);
                                                 sb.append(Mol_Environment.EOL);
                                                 sv = sv.substring(Mol_TextCifWriter.HEADER_LENGTH_MAX, sv.length());
                                             }
                                             sb.append(sv);
-                                            //sb.append(Mol_Strings.symbol_space);
                                             sb.append(Mol_Environment.EOL);
                                             sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
                                             if (columns.name.equalsIgnoreCase("struct_ref")) {
@@ -313,27 +312,18 @@ public class Mol_TextCifReader {
                                         } else {
                                             // Handle special cases:
                                             if (columns.name.equalsIgnoreCase("atom_site")) {
-                                                sb.append(v.v);
-                                                sb.append(pad);
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase("ndb_struct_na_base_pair_step")
                                                     || columns.name.equalsIgnoreCase("struct_conn")) {
                                                 if (sbss[sbss.length - 1].length() + sw > 130) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
-                                                sb.append(v.v);
-                                                sb.append(pad);
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase("struct_ref")) {
                                                 if (sw >= Mol_TextCifWriter.HEADER_LENGTH_MAX) {
-                                                    sb.append(Mol_Environment.EOL);
-                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                    sb.append(v.v);
-                                                    sb.append(Mol_Environment.EOL);
-                                                    sb.append(Mol_Environment.EOL);
-                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                    sb.append(Mol_Environment.EOL);
+                                                    add2(sb, v.v.concat(Mol_Environment.EOL));
                                                 } else {
-                                                    sb.append(v.v);
-                                                    sb.append(pad);
+                                                    add_s_pad(sb, pad, v.v);
                                                 }
                                             } else if (columns.name.equalsIgnoreCase("entity_poly")) {
                                                 if (sbss[sbss.length - 1].length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
@@ -348,19 +338,12 @@ public class Mol_TextCifReader {
                                                         }
                                                     }
                                                 }
-                                                sb.append(v.v);
-                                                sb.append(pad);
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase("citation_author") && column.name.equalsIgnoreCase("name")) {
                                                 if (!v.v.startsWith("'")) {
-                                                    sb.append(Mol_Environment.EOL);
-                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                    sb.append(v.v);
-                                                    sb.append(Mol_Environment.EOL);
-                                                    sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                    sb.append(Mol_Environment.EOL);
+                                                    add2(sb, v.v);
                                                 } else {
-                                                    sb.append(v.v);
-                                                    sb.append(pad);
+                                                    add_s_pad(sb, pad, v.v);
                                                 }
                                             } else if (columns.name.equalsIgnoreCase("struct_ref")) {
                                                 if (sbss[sbss.length - 1].length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
@@ -368,11 +351,9 @@ public class Mol_TextCifReader {
                                                         sb.append(Mol_Environment.EOL);
                                                     }
                                                 }
-                                                sb.append(v.v);
-                                                sb.append(pad);
+                                                add_s_pad(sb, pad, v.v);
                                             } else {
-                                                sb.append(v.v);
-                                                sb.append(pad);
+                                                add_s_pad(sb, pad, v.v);
                                             }
                                         }
                                     }
@@ -395,41 +376,19 @@ public class Mol_TextCifReader {
                                         // Handle special cases:
                                         if (dataItems.name.equalsIgnoreCase("em_entity_assembly")) {
                                             if (sb.toString().length() + pad.length() + dv.length() > 130) {
-                                                sb.append(pad);
-                                                sb.append(Mol_Environment.EOL);
-                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                sb.append(dv);
-                                                sb.append(Mol_Environment.EOL);
-                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                sb.append(Mol_Environment.EOL);
+                                                add1(sb, pad, dv);
                                             } else {
-                                                sb.append(pad);
-                                                sb.append(dv);
-                                                sb.append(Mol_Strings.symbol_space);
-                                                sb.append(Mol_Environment.EOL);
+                                                add0(sb, pad, dv);
                                             }
                                         } else if (dataItems.name.equalsIgnoreCase("pdbx_struct_assembly_gen")) {
                                             if (sb.toString().length() + pad.length() + dv.length() > Mol_TextCifWriter.HEADER_LENGTH_MAX) {
-                                                sb.append(pad);
-                                                sb.append(Mol_Environment.EOL);
-                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                sb.append(dv);
-                                                sb.append(Mol_Environment.EOL);
-                                                sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-                                                sb.append(Mol_Environment.EOL);
+                                                add1(sb, pad, dv);
                                             } else {
-                                                sb.append(pad);
-                                                sb.append(dv);
-                                                sb.append(Mol_Strings.symbol_space);
-                                                sb.append(Mol_Environment.EOL);
+                                                add0(sb, pad, dv);
                                             }
                                         } else {
-                                            sb.append(pad);
-                                            sb.append(dv);
-                                            sb.append(Mol_Strings.symbol_space);
-                                            sb.append(Mol_Environment.EOL);
+                                            add0(sb, pad, dv);
                                         }
-
                                         //System.out.print(sb.toString());
                                         bw.write(sb.toString());
                                     } catch (IOException ex1) {
@@ -460,7 +419,70 @@ public class Mol_TextCifReader {
     }
 
     /**
-     *
+     * 
+     * @param sb String Builder.
+     * @param pad The padding to add1 before the variable
+     * @param s The string to append after pad and before a space and EOL.
+     */
+    protected static void add0(StringBuilder sb, String pad, String s) {
+        sb.append(pad);
+        sb.append(s);
+        sb.append(Mol_Strings.symbol_space);
+        sb.append(Mol_Environment.EOL);
+    }
+
+    /**
+     * Appends pad to sb, then calls {@link #add2(java.lang.StringBuilder, java.lang.String)}.
+     * @param sb String Builder.
+     * @param pad The padding to prepend to sb.
+     * @param s What is passed to {@link #add2(java.lang.StringBuilder, java.lang.String)}.
+     */
+    protected static void add1(StringBuilder sb, String pad, String s) {
+        sb.append(pad);
+        add2(sb, s);
+    }
+    
+    /**
+     * Appends Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON, s, 
+     * Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON and 
+     * Mol_Environment.EOL to sb.
+     * @param sb String Builder.
+     * @param s The String to add between Mol_Environment.EOL and 
+     * Mol_Strings.SYMBOL_SEMI_COLON symbols.
+     */
+    protected static void add2(StringBuilder sb, String s) {
+        sb.append(Mol_Environment.EOL);
+        sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+        sb.append(s);
+        sb.append(Mol_Environment.EOL);
+        sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+        sb.append(Mol_Environment.EOL);
+    }
+    
+    /**
+     * Appends s and pad to sb.
+     * @param sb String Builder.
+     * @param pad The padding to add after s.
+     * @param s The String to append before pad.
+     */
+    protected static void add_s_pad(StringBuilder sb, String pad, String s) {
+        sb.append(s);
+        sb.append(pad);
+    }
+    
+    /**
+     * Appends pad and s to sb.
+     * @param sb String Builder.
+     * @param pad The padding to add before s.
+     * @param s The String to append after pad.
+     */
+    protected static void add_pad_s(StringBuilder sb, String pad, String s) {
+        sb.append(pad);
+        sb.append(s);
+    }
+    
+    /**
+     * For writing name.
      * @param bw The BufferedWriter.
      * @param categoryName The category name.
      * @param variableName The variable name.
@@ -783,13 +805,13 @@ public class Mol_TextCifReader {
 
 //    /**
 //     * @param name The name of the variable.
-//     * @param ids The ids to add to.
+//     * @param ids The ids to add1 to.
 //     */
 //    protected void addColumn(Category category, String name, ArrayList<Variable_ID> ids) {
 //        Column column = new Column(category, name);
 //        int key = cif.id2name.size();
 //        Variable_ID id = new Variable_ID(key);
-//        ids.add(id);
+//        ids.add1(id);
 //        cif.name2id.put(name, id);
 //        cif.id2name.put(id, name);
 //        category.setVariable(id, column);
