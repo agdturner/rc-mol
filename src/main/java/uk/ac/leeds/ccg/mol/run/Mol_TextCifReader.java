@@ -265,13 +265,9 @@ public class Mol_TextCifReader {
                                 columns.cols.keySet().forEach(cid -> {
                                     Column col = columns.cols.get(cid);
                                     try {
-                                        String s2 = Mol_Strings.symbol_underscore
-                                                + columns.name + Mol_Strings.symbol_dot
-                                                + col.name + Mol_Strings.symbol_space 
-                                                + Mol_Environment.EOL;
-                                        //System.out.print(s2);
-                                        //bw.write(Mol_Strings.symbol_space);
-                                        bw.write(s2);
+                                        writeName(bw, columns.name, col.name);
+                                        //System.out.println();
+                                        bw.write(Mol_Environment.EOL);
                                     } catch (IOException ex1) {
                                         Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
                                     }
@@ -284,7 +280,6 @@ public class Mol_TextCifReader {
                                     for (int c = 0; c < ncols; c++) {
                                         Column_ID cid = new Column_ID(c); // It would probably be better to look this up rather than create it each time.
                                         Column column = columns.cols.get(cid);
-
                                         int w = column.getWidth();
                                         Value v = columns.getValue(r, c);
                                         int sw = v.v.length();
@@ -320,8 +315,8 @@ public class Mol_TextCifReader {
                                             if (columns.name.equalsIgnoreCase("atom_site")) {
                                                 sb.append(v.v);
                                                 sb.append(pad);
-                                            } else if (columns.name.equalsIgnoreCase("ndb_struct_na_base_pair_step") ||
-                                                    columns.name.equalsIgnoreCase("struct_conn")) {
+                                            } else if (columns.name.equalsIgnoreCase("ndb_struct_na_base_pair_step")
+                                                    || columns.name.equalsIgnoreCase("struct_conn")) {
                                                 if (sbss[sbss.length - 1].length() + sw > 130) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
@@ -393,13 +388,10 @@ public class Mol_TextCifReader {
                                 dataItems.dataItems.keySet().forEach(z -> {
                                     try {
                                         DataItem d = dataItems.dataItems.get(z);
+                                        writeName(bw, dataItems.name, d.name);
                                         String dv = d.value;
                                         String pad = ex.padding.get(nml - d.name.length() + 3);
                                         StringBuilder sb = new StringBuilder();
-                                        sb.append(Mol_Strings.symbol_underscore);
-                                        sb.append(dataItems.name);
-                                        sb.append(Mol_Strings.symbol_dot);
-                                        sb.append(d.name);
                                         // Handle special cases:
                                         if (dataItems.name.equalsIgnoreCase("em_entity_assembly")) {
                                             if (sb.toString().length() + pad.length() + dv.length() > 130) {
@@ -465,6 +457,23 @@ public class Mol_TextCifReader {
             System.err.println(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     *
+     * @param bw The BufferedWriter.
+     * @param categoryName The category name.
+     * @param variableName The variable name.
+     * @throws IOException
+     */
+    protected static void writeName(BufferedWriter bw, String categoryName, String variableName) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Mol_Strings.symbol_underscore);
+        sb.append(categoryName);
+        sb.append(Mol_Strings.symbol_dot);
+        sb.append(variableName);
+        //bw.write(sb.toString());
+        bw.write(sb.toString());
     }
 
     /**
