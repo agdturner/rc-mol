@@ -148,8 +148,8 @@ public class Mol_TextCifReader {
 
         Mol_TextCifReader ex = new Mol_TextCifReader();
         try {
-            //String pdbId = "4ug0";
-            String pdbId = "6xu8";
+            String pdbId = "4ug0";
+            //String pdbId = "6xu8";
             //boolean parseBinary = true;
             boolean parseBinary = false;
             System.out.println("Load " + pdbId + " parseBinary " + Boolean.toString(parseBinary));
@@ -165,12 +165,13 @@ public class Mol_TextCifReader {
 //            } else {
 //                // parse CIF from RCSB PDB
 //                cifFile = CifIO.readFromURL(new URL("https://files.rcsb.org/download/" + pdbId + ".cif"));
+//https://files.rcsb.org/download/4ug0.cif
+//https://files.rcsb.org/download/6xu8.cif
 //            }
 //            // fine-grained options are available in the CifOptions class
 
-            String code = "6xu8";
             Path dir = Paths.get("C:", "Users", "geoagdt", "Downloads");
-            Path p = Paths.get(dir.toString(), code + ".cif");
+            Path p = Paths.get(dir.toString(), pdbId + ".cif");
 
             // Read data
             // Set up reader
@@ -242,7 +243,7 @@ public class Mol_TextCifReader {
 
             // Print/write from the in memory representation.
             // Set up writer
-            Path outp = Paths.get(dir.toString(), code + ".cif2");
+            Path outp = Paths.get(dir.toString(), pdbId + ".cif2");
             BufferedWriter bw = Generic_IO.getBufferedWriter(outp, false);
 
             ex.cif.dataBlocks.stream().forEach(x -> {
@@ -419,7 +420,7 @@ public class Mol_TextCifReader {
     }
 
     /**
-     * 
+     *
      * @param sb String Builder.
      * @param pad The padding to add1 before the variable
      * @param s The string to append after pad and before a space and EOL.
@@ -432,22 +433,26 @@ public class Mol_TextCifReader {
     }
 
     /**
-     * Appends pad to sb, then calls {@link #add2(java.lang.StringBuilder, java.lang.String)}.
+     * Appends pad to sb, then calls
+     * {@link #add2(java.lang.StringBuilder, java.lang.String)}.
+     *
      * @param sb String Builder.
      * @param pad The padding to prepend to sb.
-     * @param s What is passed to {@link #add2(java.lang.StringBuilder, java.lang.String)}.
+     * @param s What is passed to
+     * {@link #add2(java.lang.StringBuilder, java.lang.String)}.
      */
     protected static void add1(StringBuilder sb, String pad, String s) {
         sb.append(pad);
         add2(sb, s);
     }
-    
+
     /**
-     * Appends Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON, s, 
-     * Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON and 
+     * Appends Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON, s,
+     * Mol_Environment.EOL, Mol_Strings.SYMBOL_SEMI_COLON and
      * Mol_Environment.EOL to sb.
+     *
      * @param sb String Builder.
-     * @param s The String to add between Mol_Environment.EOL and 
+     * @param s The String to add between Mol_Environment.EOL and
      * Mol_Strings.SYMBOL_SEMI_COLON symbols.
      */
     protected static void add2(StringBuilder sb, String s) {
@@ -458,9 +463,10 @@ public class Mol_TextCifReader {
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
         sb.append(Mol_Environment.EOL);
     }
-    
+
     /**
      * Appends s and pad to sb.
+     *
      * @param sb String Builder.
      * @param pad The padding to add after s.
      * @param s The String to append before pad.
@@ -469,9 +475,10 @@ public class Mol_TextCifReader {
         sb.append(s);
         sb.append(pad);
     }
-    
+
     /**
      * Appends pad and s to sb.
+     *
      * @param sb String Builder.
      * @param pad The padding to add before s.
      * @param s The String to append after pad.
@@ -480,9 +487,10 @@ public class Mol_TextCifReader {
         sb.append(pad);
         sb.append(s);
     }
-    
+
     /**
      * For writing name.
+     *
      * @param bw The BufferedWriter.
      * @param categoryName The category name.
      * @param variableName The variable name.
@@ -734,19 +742,22 @@ public class Mol_TextCifReader {
                     if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
                         Column_ID cid = new Column_ID(values.size());
                         Column column = columns.cols.get(cid);
+                        if (column == null) {
+                            int debug = 1;
+                        }
                         if (column.name.equalsIgnoreCase("name")) {
                             values.add(line2.substring(1)); // Strip off the semi-colon.
                             String line3 = reader.readLine();
                             //System.out.println(line3);
                             if (line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                                String line4 = reader.readLine();
-                                //System.out.println(line4);
-                                values.addAll(getValues(line4));
-
                                 if (values.size() != columns.cols.size()) {
-                                    int debug = 1;
+                                    String line4 = reader.readLine();
+                                    //System.out.println(line4);
+                                    values.addAll(getValues(line4));
+                                    if (values.size() != columns.cols.size()) {
+                                        int debug = 1;
+                                    }
                                 }
-
                             }
                         } else if (column.name.equalsIgnoreCase("pdbx_seq_one_letter_code")
                                 || column.name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
