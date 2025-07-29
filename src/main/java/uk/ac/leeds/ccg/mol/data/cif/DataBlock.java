@@ -32,7 +32,7 @@ public class DataBlock extends Mol_Object {
     /**
      * The DataBlockHeading.
      */
-    public DataBlockHeading dbh;
+    public final DataBlockHeading dbh;
     
     /**
      * This list orders Columns and DataItems. 
@@ -42,32 +42,32 @@ public class DataBlock extends Mol_Object {
     /**
      * A look up from a Column name to a Column_ID.
      */
-    protected HashMap<String, Columns_ID> columnsName2ColumnsId;
+    protected final HashMap<String, Columns_ID> columnsName2ColumnsId;
 
     /**
      * A look up from a Column_ID to a Column name.
      */
-    protected HashMap<Columns_ID, String> columnsId2ColumnsName;
+    protected final HashMap<Columns_ID, String> columnsId2ColumnsName;
     
     /**
      * Columnss
      */
-    protected HashMap<Columns_ID, Columns> columnss;
+    protected final HashMap<Columns_ID, Columns> columnss;
             
     /**
      * A look up from a DataItem name to a DataItem_ID.
      */
-    protected HashMap<String, DataItems_ID> dataItemsName2DataItemsId;
+    protected final HashMap<String, DataItems_ID> dataItemsName2DataItemsId;
 
     /**
      * A look up from a DataItem_ID to a DataItem name.
      */
-    protected HashMap<DataItems_ID, String> dataItemsId2DataItemsName;
+    protected final HashMap<DataItems_ID, String> dataItemsId2DataItemsName;
 
     /**
      * DataItemss
      */
-    protected HashMap<DataItems_ID, DataItems> dataItemss;
+    protected final HashMap<DataItems_ID, DataItems> dataItemss;
 
     /**
      * Create a new instance.

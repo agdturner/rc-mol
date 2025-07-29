@@ -15,8 +15,7 @@
  */
 package uk.ac.leeds.ccg.mol.data.cif;
 
-import java.util.ArrayList;
-
+import java.util.HashMap;
 
 /**
  * Column class.
@@ -32,7 +31,7 @@ public class Column extends Variable {
     /**
      * The values. 
      */
-    public ArrayList<Value> values;
+    public HashMap<Row_ID, Value> values;
     
     /**
      * Create a new instance.
@@ -41,7 +40,7 @@ public class Column extends Variable {
      */
     public Column(Columns columns, String name) {
         super(columns, name);
-        this.values = new ArrayList<>();
+        this.values = new HashMap<>();
     }
     
     /**
@@ -50,7 +49,7 @@ public class Column extends Variable {
     public int getWidth() {
         if (w == null) {
             w = 0;
-            values.forEach(x -> {
+            values.values().forEach(x -> {
                 w = Math.max(w, x.v.length());
             });
         }

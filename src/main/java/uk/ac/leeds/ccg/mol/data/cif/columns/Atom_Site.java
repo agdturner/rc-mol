@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif.data_items;
+package uk.ac.leeds.ccg.mol.data.cif.columns;
 
-import uk.ac.leeds.ccg.mol.data.cif.DataItems;
-import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 
 /**
- * Atom_Site DataItems.
+ * Atom_Site Columns.
  * @author Andy Turner
  */
-public class Atom_Site extends DataItems {
+public class Atom_Site extends Columns {
     
     /**
      * "atom_site"
@@ -33,7 +33,7 @@ public class Atom_Site extends DataItems {
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Atom_Site(DataItems_ID id) {
+    public Atom_Site(Columns_ID id) {
         super(NAME, id);
     }
     
