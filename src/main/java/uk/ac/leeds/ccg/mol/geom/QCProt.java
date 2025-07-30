@@ -67,6 +67,8 @@ public class QCProt {
      */
     public static void main(String[] args) {
         /**
+         * https://web.archive.org/web/20240203104803/https://theobald.brandeis.edu/qcp/main.c
+         *
          * Sample code to use the routine for fast RMSD & rotational matrix
          * calculation. Note that we superposition frag_b onto frag_a. For the
          * example provided below, the minimum least-squares RMSD for the two
@@ -136,7 +138,6 @@ public class QCProt {
         frag_b[0][6] = -18.577;
         frag_b[1][6] = -10.001;
         frag_b[2][6] = 17.996;
-        Math_Matrix_Double mfrag_a = new Math_Matrix_Double(frag_a);
 
         double[] weight = new double[len];
         for (int i = 0; i < len; i++) {
@@ -205,7 +206,7 @@ public class QCProt {
         if (res.weight == null) {
             wsum = len;
         } else {
-            wsum = 0.0;
+            wsum = 0d;
             for (int i = 0; i < len; i++) {
                 wsum += res.weight[i];
             }
@@ -230,8 +231,8 @@ public class QCProt {
         double[] C = new double[4];
         int i;
         double mxEigenV;
-        double oldg = 0.0;
-        double b, a, delta, rms, qsqr;
+        double oldg;
+        double b, a, delta, qsqr;
         double q1, q2, q3, q4;
         double normq;
         double a11, a12, a13, a14, a21, a22, a23, a24;
@@ -289,24 +290,27 @@ public class QCProt {
 
         /* Newton-Raphson */
         mxEigenV = E0;
-        for (i = 0; i < 50; ++i) {
+        for (i = 0; i < 50; i++) {
             oldg = mxEigenV;
             x2 = mxEigenV * mxEigenV;
             b = (x2 + C[2]) * mxEigenV;
             a = b + C[1];
             delta = ((a * mxEigenV + C[0]) / (2.0 * x2 * mxEigenV + b + a));
             mxEigenV -= delta;
-            /* printf("\n diff[%3d]: %16g %16g %16g", i, mxEigenV - oldg, evalprec*mxEigenV, mxEigenV); */
+            //res.rmsd = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
+            //System.out.println("Iteration " + i + " res.rmsd " + res.rmsd);
             if (Math.abs(mxEigenV - oldg) < Math.abs(evalprec * mxEigenV)) {
                 break;
             }
         }
 
         if (i == 50) {
-            //System.out.println(stderr,"\nMore than %d iterations needed!\n", i);
+            System.out.println("More than " + i + " iterations needed!");
         }
         /* the Math.abs() is to guard against extremely small, but *negative* numbers due to floating point error */
         res.rmsd = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
+        
+        System.out.println("res.rmsd " + res.rmsd);
 
         if (minScore > 0) {
             if (res.rmsd < minScore) {
@@ -342,10 +346,11 @@ public class QCProt {
 
         qsqr = q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4;
 
-        /* The following code tries to calculate another column in the adjoint matrix when the norm of the
-   current column is too small.
-   Usually this block will never be activated.  To be absolutely safe this should be
-   uncommented, but it is most likely unnecessary.
+        /**
+         * The following code tries to calculate another column in the adjoint
+         * matrix when the norm of the current column is too small. Usually this
+         * block will never be activated. To be absolutely safe this should be
+         * uncommented, but it is most likely unnecessary.
          */
         if (qsqr < evecprec) {
             q1 = a12 * a3344_4334 - a13 * a3244_4234 + a14 * a3243_4233;

@@ -50,7 +50,7 @@ import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
  *
  * @author Andy Turner
  */
-public class Example1 {
+public class IO_WithCIFTools_Example {
 
     public static int LINE_CHAR_LENGTH_MAX = 2048;
 
@@ -66,11 +66,11 @@ public class Example1 {
     /**
      * Create a new instance.
      */
-    public Example1() {
+    public IO_WithCIFTools_Example() {
     }
 
     public static void main(String[] args) {
-        Example1 ex = new Example1();
+        IO_WithCIFTools_Example ex = new IO_WithCIFTools_Example();
         try {
             //String pdbId = "4ug0";
             String pdbId = "6xu8";
@@ -327,7 +327,7 @@ public class Example1 {
                 try {
                     write(l, bos);
                 } catch (IOException ex) {
-                    Logger.getLogger(Example1.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(IO_WithCIFTools_Example.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });            
             bos.flush();

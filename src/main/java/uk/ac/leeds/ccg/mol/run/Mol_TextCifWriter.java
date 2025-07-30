@@ -45,7 +45,7 @@ import org.rcsb.cif.schema.StandardSchemata;
 import org.rcsb.cif.schema.mm.MmCifBlock;
 import org.rcsb.cif.schema.mm.MmCifFile;
 import uk.ac.leeds.ccg.generic.io.Generic_IO;
-import static uk.ac.leeds.ccg.mol.run.Example1.LINE_CHAR_LENGTH_MAX;
+import static uk.ac.leeds.ccg.mol.run.IO_WithCIFTools_Example.LINE_CHAR_LENGTH_MAX;
 
 /**
  *
