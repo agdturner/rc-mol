@@ -12,11 +12,48 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * This code is based on
+ * https://web.archive.org/web/20240203104803/https://theobald.brandeis.edu/qcp/main.c
+ * Douglas L. Theobald (2005) "Rapid calculation of RMSD using a
+ * quaternion-based characteristic polynomial." Acta Crystallographica A
+ * 61(4):478-480.
+ *
+ * Pu Liu, Dmitris K. Agrafiotis, and Douglas L. Theobald (2009) "Fast
+ * determination of the optimal rotational matrix for macromolecular
+ * superpositions." Journal of Computational Chemistry 31(7):1561-1563.
+ *
+ * Copyright (c) 2009-2016 Pu Liu and Douglas L. Theobald All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. Redistributions
+ * in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other
+ * materials provided with the distribution. Neither the name of the
+ * <ORGANIZATION> nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior
+ * written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.leeds.ccg.mol.geom;
 
-import ch.obermuhlner.math.big.BigRational;
-import uk.ac.leeds.ccg.math.matrices.Math_Matrix_Double;
+import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
 
 /**
  *
@@ -25,204 +62,118 @@ import uk.ac.leeds.ccg.math.matrices.Math_Matrix_Double;
 public class QCProt {
 
     /**
-     * This code is based on
-     * https://web.archive.org/web/20240203104803/https://theobald.brandeis.edu/qcp/main.c
-     * Douglas L. Theobald (2005) "Rapid calculation of RMSD using a
-     * quaternion-based characteristic polynomial." Acta Crystallographica A
-     * 61(4):478-480.
-     *
-     * Pu Liu, Dmitris K. Agrafiotis, and Douglas L. Theobald (2009) "Fast
-     * determination of the optimal rotational matrix for macromolecular
-     * superpositions." Journal of Computational Chemistry 31(7):1561-1563.
-     *
-     * Copyright (c) 2009-2016 Pu Liu and Douglas L. Theobald All rights
-     * reserved.
-     *
-     * Redistribution and use in source and binary forms, with or without
-     * modification, are permitted provided that the following conditions are
-     * met:
-     *
-     *  * Redistributions of source code must retain the above copyright notice,
-     * this list of conditions and the following disclaimer. * Redistributions
-     * in binary form must reproduce the above copyright notice, this list of
-     * conditions and the following disclaimer in the documentation and/or other
-     * materials provided with the distribution. * Neither the name of the
-     * <ORGANIZATION> nor the names of its contributors may be used to endorse
-     * or promote products derived from this software without specific prior
-     * written permission.
-     *
-     * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-     * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-     * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-     * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-     * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-     * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-     * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-     * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-     * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-     * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-     * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-     *
-     * @param args
+     * The quaternion components.
      */
-    public static void main(String[] args) {
-        /**
-         * https://web.archive.org/web/20240203104803/https://theobald.brandeis.edu/qcp/main.c
-         *
-         * Sample code to use the routine for fast RMSD & rotational matrix
-         * calculation. Note that we superposition frag_b onto frag_a. For the
-         * example provided below, the minimum least-squares RMSD for the two
-         * 7-atom fragments should be 0.719106 A.
-         *
-         * The rotation quaterion should be:
-         *
-         * -8.620063e-01 3.435505e-01 1.242953e-01 -3.513814e-01
-         *
-         * And the corresponding 3x3 rotation matrix is:
-         *
-         * [ 0.72216358 0.69118937 -0.02714790 ] [ -0.52038257 0.51700833
-         * -0.67963547 ] [ -0.45572112 0.50493528 0.73304748 ]
-         *
-         * Compile instruction:
-         *
-         * make
-         *
-         * How to incorporate the code into your own package.
-         *
-         * 1. copy the qcprot.h and qcprot.c into the source directory 2. change
-         * your own code to call the fast rotational routine and include the
-         * qcprot.h 3. change your make file to include qcprot.c
-         */
-        int len = 7;
-        double[][] frag_a = new double[3][len];
-        frag_a[0][0] = -2.803;
-        frag_a[1][0] = -15.373;
-        frag_a[2][0] = 24.556;
-        frag_a[0][1] = 0.893;
-        frag_a[1][1] = -16.062;
-        frag_a[2][1] = 25.147;
-        frag_a[0][2] = 1.368;
-        frag_a[1][2] = -12.371;
-        frag_a[2][2] = 25.885;
-        frag_a[0][3] = -1.651;
-        frag_a[1][3] = -12.153;
-        frag_a[2][3] = 28.177;
-        frag_a[0][4] = -0.440;
-        frag_a[1][4] = -15.218;
-        frag_a[2][4] = 30.068;
-        frag_a[0][5] = 2.551;
-        frag_a[1][5] = -13.273;
-        frag_a[2][5] = 31.372;
-        frag_a[0][6] = 0.105;
-        frag_a[1][6] = -11.330;
-        frag_a[2][6] = 33.567;
-        double[][] frag_b = new double[3][len];
-        frag_b[0][0] = -14.739;
-        frag_b[1][0] = -18.673;
-        frag_b[2][0] = 15.040;
-        frag_b[0][1] = -12.473;
-        frag_b[1][1] = -15.810;
-        frag_b[2][1] = 16.074;
-        frag_b[0][2] = -14.802;
-        frag_b[1][2] = -13.307;
-        frag_b[2][2] = 14.408;
-        frag_b[0][3] = -17.782;
-        frag_b[1][3] = -14.852;
-        frag_b[2][3] = 16.171;
-        frag_b[0][4] = -16.124;
-        frag_b[1][4] = -14.617;
-        frag_b[2][4] = 19.584;
-        frag_b[0][5] = -15.029;
-        frag_b[1][5] = -11.037;
-        frag_b[2][5] = 18.902;
-        frag_b[0][6] = -18.577;
-        frag_b[1][6] = -10.001;
-        frag_b[2][6] = 17.996;
+    double q1, q2, q3, q4;
 
-        double[] weight = new double[len];
-        for (int i = 0; i < len; i++) {
-            weight[i] = i + 1d;
-        }
+    /**
+     * For storing the root mean squared error.
+     */
+    double rmsd;
 
-        System.out.println("Coords before centering");
-        System.out.println("frag_a");
-        print(frag_a, len);
-        System.out.println("frag_b");
-        print(frag_b, len);
+    /**
+     * For storing the weighted root mean squared error.
+     */
+    double wrmsd;
 
-        frag_a = centre(frag_a, len);
-        frag_b = centre(frag_b, len);
-        System.out.println("Coords after centering");
-        System.out.println("frag_a");
-        print(frag_a, len);
-        System.out.println("frag_b");
-        print(frag_b, len);
+    /**
+     * For storing the rotation matrix.
+     */
+    double[] rotmat;
 
-        Res res = calcRMSDRotationalMatrix(frag_a, frag_b, len);
+    /**
+     * For storing the weights.
+     */
+    double[] weight;
 
-        System.out.println("RMSD " + res.rmsd);
-        System.out.println("q1 = " + res.q1);
-        System.out.println("q2 = " + res.q2);
-        System.out.println("q3 = " + res.q3);
-        System.out.println("q4 = " + res.q4);
+    /**
+     * For storing the rotated coordinates.
+     */
+    double[][] coords1;
 
-        System.out.println("QCP Rotation matrix");
-        print(res.rotmat);
+    /**
+     * For storing the rotated coordinates.
+     */
+    double[][] coords2;
+
+    /**
+     * For storing the rotated coordinates.
+     */
+    double[][] coords2Rotated;
+
+    /**
+     * For storing the number of coordinates.
+     */
+    int len;
+
+    /**
+     * For storing the number of coordinates as a double.
+     */
+    double n;
+
+    /**
+     * Create a new instance. The parameters coords1 and coords2 are expected to
+     * have the same dimensions. The respective x, y and z coordinates for the
+     * point are in: coords1[0] and coords2[0], coords1[1] and coords2[1], and
+     * coords1[2] and coords1[3]. The order of these must be consistent between
+     * the two sets of points, but these can be in any order. are the x, y and z
+     * coordinates for each point respectively.
+     *
+     * @param coords1 The centralised coordinates to be fitted to.
+     * @param coords2 The centralised coordinates to be fitted.
+     */
+    public QCProt(double[][] coords1, double[][] coords2) {
+        rotmat = new double[9];
+        this.coords1 = coords1;
+        this.coords2 = coords2;
+        this.len = coords1[0].length;
+        double wsum = len;
+
+        double[] A = new double[9];
+        /* calculate the (weighted) inner product of two structures */
+        double E0 = innerProduct(A);
+
+        /* calculate the RMSD & rotational matrix */
+        fastCalcRMSDAndRotation(A, E0, wsum, -1, -1d);
 
         /* apply rotation matrix */
-        double x, y, z;
+        coords2Rotated = new double[3][len];
         for (int i = 0; i < len; i++) {
-            x = res.rotmat[0] * frag_b[0][i] + res.rotmat[1] * frag_b[1][i] + res.rotmat[2] * frag_b[2][i];
-            y = res.rotmat[3] * frag_b[0][i] + res.rotmat[4] * frag_b[1][i] + res.rotmat[5] * frag_b[2][i];
-            z = res.rotmat[6] * frag_b[0][i] + res.rotmat[7] * frag_b[1][i] + res.rotmat[8] * frag_b[2][i];
-
-            frag_b[0][i] = x;
-            frag_b[1][i] = y;
-            frag_b[2][i] = z;
+            coords2Rotated[0][i] = rotmat[0] * coords2[0][i] + rotmat[1] * coords2[1][i] + rotmat[2] * coords2[2][i];
+            coords2Rotated[1][i] = rotmat[3] * coords2[0][i] + rotmat[4] * coords2[1][i] + rotmat[5] * coords2[2][i];
+            coords2Rotated[2][i] = rotmat[6] * coords2[0][i] + rotmat[7] * coords2[1][i] + rotmat[8] * coords2[2][i];
         }
 
         /* calculate euclidean distance */
         double euc_dist = 0d;
+        double weuc_dist = 0d;
         double wtsum = 0d;
         for (int i = 0; i < len; i++) {
             wtsum += weight[i];
-            double tmp = Math.pow(frag_a[0][i] - frag_b[0][i], 2)
-                    + Math.pow(frag_a[1][i] - frag_b[1][i], 2)
-                    + Math.pow(frag_a[2][i] - frag_b[2][i], 2);
-            euc_dist += weight[i] * tmp;
+            double tmp = Math.pow(coords1[0][i] - coords2Rotated[0][i], 2)
+                    + Math.pow(coords1[1][i] - coords2Rotated[1][i], 2)
+                    + Math.pow(coords1[2][i] - coords2Rotated[2][i], 2);
+            weuc_dist += weight[i] * tmp;
+            euc_dist += tmp;
         }
 
-        System.out.println("Coords 2 after rotation:");
-        print(frag_b, len);
-
-        System.out.println("Explicit RMSD calculated from transformed coords: " + Math.sqrt(euc_dist / wtsum));
-
+        wrmsd = Math.sqrt(euc_dist / wtsum);
+        //System.out.println("Explicit Weighted RMSD calculated from transformed coords: " + wrmsd);
+        rmsd = Math.sqrt(euc_dist / (double) len);
+        //System.out.println("Explicit RMSD calculated from transformed coords: " + rmsd);
     }
 
-    protected static Res calcRMSDRotationalMatrix(
-            double[][] coords1, double[][] coords2, int len) {
-        Res res = new Res(len);
-        double wsum;
-        if (res.weight == null) {
-            wsum = len;
-        } else {
-            wsum = 0d;
-            for (int i = 0; i < len; i++) {
-                wsum += res.weight[i];
-            }
-        }
-
-        double[] A = new double[9];
-        /* calculate the (weighted) inner product of two structures */
-        double E0 = innerProduct(A, coords1, coords2, len, res);
-
-        /* calculate the RMSD & rotational matrix */
-        fastCalcRMSDAndRotation(A, E0, wsum, -1, res, -1d);
-
-        return res;
-    }
-
-    protected static int fastCalcRMSDAndRotation(double[] A, double E0, double wsum, double len, Res res, double minScore) {
+    /**
+     * fastCalcRMSDAndRotation
+     *
+     * @param A
+     * @param E0
+     * @param wsum
+     * @param len
+     * @param minScore
+     * @return
+     */
+    protected int fastCalcRMSDAndRotation(double[] A, double E0, double wsum, double len, double minScore) {
         double Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
         double Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
                 SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
@@ -233,7 +184,6 @@ public class QCProt {
         double mxEigenV;
         double oldg;
         double b, a, delta, qsqr;
-        double q1, q2, q3, q4;
         double normq;
         double a11, a12, a13, a14, a21, a22, a23, a24;
         double a31, a32, a33, a34, a41, a42, a43, a44;
@@ -297,8 +247,8 @@ public class QCProt {
             a = b + C[1];
             delta = ((a * mxEigenV + C[0]) / (2.0 * x2 * mxEigenV + b + a));
             mxEigenV -= delta;
-            //res.rmsd = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
-            //System.out.println("Iteration " + i + " res.rmsd " + res.rmsd);
+            //rmsd = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
+            //System.out.println("Iteration " + i + " rmsd " + rmsd);
             if (Math.abs(mxEigenV - oldg) < Math.abs(evalprec * mxEigenV)) {
                 break;
             }
@@ -308,12 +258,11 @@ public class QCProt {
             System.out.println("More than " + i + " iterations needed!");
         }
         /* the Math.abs() is to guard against extremely small, but *negative* numbers due to floating point error */
-        res.rmsd = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
-        
-        System.out.println("res.rmsd " + res.rmsd);
+        double score = Math.sqrt(Math.abs(2d * (E0 - mxEigenV) / len));
 
+        //System.out.println("rmsd " + rmsd);
         if (minScore > 0) {
-            if (res.rmsd < minScore) {
+            if (score < minScore) {
                 return -1; // Don't bother with rotation.
             }
         }
@@ -379,13 +328,8 @@ public class QCProt {
 
                     if (qsqr < evecprec) {
                         /* if qsqr is still too small, return the identity matrix. */
-                        res.rotmat[0] = res.rotmat[4] = res.rotmat[8] = 1.0;
-                        res.rotmat[1] = res.rotmat[2] = res.rotmat[3] = res.rotmat[5] = res.rotmat[6] = res.rotmat[7] = 0.0;
-
-                        res.q1 = q1;
-                        res.q2 = q2;
-                        res.q3 = q3;
-                        res.q4 = q4;
+                        rotmat[0] = rotmat[4] = rotmat[8] = 1.0;
+                        rotmat[1] = rotmat[2] = rotmat[3] = rotmat[5] = rotmat[6] = rotmat[7] = 0.0;
 
                         return 0;
                     }
@@ -411,25 +355,26 @@ public class QCProt {
         yz = q3 * q4;
         ax = q1 * q2;
 
-        res.rotmat[0] = a2 + x2 - y2 - z2;
-        res.rotmat[1] = 2 * (xy + az);
-        res.rotmat[2] = 2 * (zx - ay);
-        res.rotmat[3] = 2 * (xy - az);
-        res.rotmat[4] = a2 - x2 + y2 - z2;
-        res.rotmat[5] = 2 * (yz + ax);
-        res.rotmat[6] = 2 * (zx + ay);
-        res.rotmat[7] = 2 * (yz - ax);
-        res.rotmat[8] = a2 - x2 - y2 + z2;
-
-        res.q1 = q1;
-        res.q2 = q2;
-        res.q3 = q3;
-        res.q4 = q4;
+        rotmat[0] = a2 + x2 - y2 - z2;
+        rotmat[1] = 2 * (xy + az);
+        rotmat[2] = 2 * (zx - ay);
+        rotmat[3] = 2 * (xy - az);
+        rotmat[4] = a2 - x2 + y2 - z2;
+        rotmat[5] = 2 * (yz + ax);
+        rotmat[6] = 2 * (zx + ay);
+        rotmat[7] = 2 * (yz - ax);
+        rotmat[8] = a2 - x2 - y2 + z2;
 
         return 1;
     }
 
-    protected static double innerProduct(double[] A, double[][] coords1, double[][] coords2, int len, Res res) {
+    /**
+     * For calculating the innerProduct.
+     *
+     * @param A
+     * @return
+     */
+    protected double innerProduct(double[] A) {
         double x1, x2, y1, y2, z1, z2;
         double[] fx1 = coords1[0];
         double[] fy1 = coords1[1];
@@ -441,11 +386,11 @@ public class QCProt {
 
         A[0] = A[1] = A[2] = A[3] = A[4] = A[5] = A[6] = A[7] = A[8] = 0d;
 
-        if (res.weight != null) {
+        if (weight != null) {
             for (int i = 0; i < len; i++) {
-                x1 = res.weight[i] * fx1[i];
-                y1 = res.weight[i] * fy1[i];
-                z1 = res.weight[i] * fz1[i];
+                x1 = weight[i] * fx1[i];
+                y1 = weight[i] * fy1[i];
+                z1 = weight[i] * fz1[i];
 
                 G1 += x1 * fx1[i] + y1 * fy1[i] + z1 * fz1[i];
 
@@ -453,7 +398,7 @@ public class QCProt {
                 y2 = fy2[i];
                 z2 = fz2[i];
 
-                G2 += res.weight[i] * (x2 * x2 + y2 * y2 + z2 * z2);
+                G2 += weight[i] * (x2 * x2 + y2 * y2 + z2 * z2);
 
                 A[0] += (x1 * x2);
                 A[1] += (x1 * y2);
@@ -493,24 +438,24 @@ public class QCProt {
                 A[7] += (z1 * y2);
                 A[8] += (z1 * z2);
             }
+            weight = new double[len];
+            for (int i = 0; i < len; i++) {
+                weight[i] = i + 1d;
+            }
+
         }
         return (G1 + G2) / 2d;
     }
 
-    public static class Res {
-
-        double q1, q2, q3, q4;
-        double rmsd;
-        double[] rotmat;
-        double[] weight;
-
-        public Res(int len) {
-            rotmat = new double[9];
-        }
-    }
-
-    protected static double[][] centre(double[][] coords, int len) {
-        double[][] result = new double[coords.length][len];
+    /**
+     * For calculating centralised coordinates.
+     *
+     * @param coords The coordinates to centre.
+     * @param len The number of coordinates.
+     * @return The centralised coordinates.
+     */
+    public static double[][] centre(double[][] coords, int len) {
+        double[][] r = new double[coords.length][len];
         double[] ave = new double[3];
         for (int i = 0; i < 3; i++) {
             ave[i] = 0d;
@@ -520,20 +465,31 @@ public class QCProt {
             ave[i] = ave[i] / (double) len;
             System.out.println("ave[" + i + "] " + ave[i]);
             for (int j = 0; j < len; j++) {
-                result[i][j] = coords[i][j] - ave[i];
+                r[i][j] = coords[i][j] - ave[i];
             }
         }
-        return result;
+        return r;
     }
 
-    protected static void print(double[] matrix) {
+    /**
+     * For printing the 3x3 matrix to std_out.
+     *
+     * @param matrix The matrix to print.
+     */
+    public static void print(double[] matrix) {
         for (int i = 0; i < 3; i++) {
             // 0, 3, 6; 1, 4, 7; 2, 5, 8
             System.out.println(matrix[3 * i] + " " + matrix[3 * i + 1] + " " + matrix[3 * i + 2]);
         }
     }
 
-    protected static void print(double[][] coords, int len) {
+    /**
+     * For printing coords to std_out.
+     *
+     * @param coords The coordinates to print.
+     * @param len The number of coordinates.
+     */
+    public static void print(double[][] coords, int len) {
         for (int i = 0; i < len; i++) {
             System.out.println(coords[0][i] + " " + coords[1][i] + " " + coords[2][i]);
         }

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
 import uk.ac.leeds.ccg.math.matrices.Math_Matrix_Double;
-import static uk.ac.leeds.ccg.mol.geom.QCProt.calcRMSDRotationalMatrix;
 import static uk.ac.leeds.ccg.mol.geom.QCProt.centre;
 import static uk.ac.leeds.ccg.mol.geom.QCProt.print;
 
@@ -123,10 +122,7 @@ public class QCProtTest {
         frag_b[2][6] = 17.996;
         Math_Matrix_Double mfrag_a = new Math_Matrix_Double(frag_a);
 
-        double[] weight = new double[len];
-        for (int i = 0; i < len; i++) {
-            weight[i] = i + 1d;
-        }
+        
 
         System.out.println("Coords before centering");
         System.out.println("frag_a");
@@ -142,7 +138,7 @@ public class QCProtTest {
         System.out.println("frag_b");
         print(frag_b, len);
 
-        QCProt.Res res = calcRMSDRotationalMatrix(frag_a, frag_b, len);
+        QCProt res = new QCProt(frag_a, frag_b);
 
         double epsilon = 0.000001d;
         System.out.println("q1 = " + res.q1);
@@ -183,40 +179,14 @@ public class QCProtTest {
             }
         }
 
-        /* apply rotation matrix */
-        double x, y, z;
-        for (int i = 0; i < len; i++) {
-            x = res.rotmat[0] * frag_b[0][i] + res.rotmat[1] * frag_b[1][i] + res.rotmat[2] * frag_b[2][i];
-            y = res.rotmat[3] * frag_b[0][i] + res.rotmat[4] * frag_b[1][i] + res.rotmat[5] * frag_b[2][i];
-            z = res.rotmat[6] * frag_b[0][i] + res.rotmat[7] * frag_b[1][i] + res.rotmat[8] * frag_b[2][i];
-
-            frag_b[0][i] = x;
-            frag_b[1][i] = y;
-            frag_b[2][i] = z;
-        }
-
-        /* calculate euclidean distance */
-        double euc_dist = 0d;
-        double weuc_dist = 0d;
-        double wtsum = 0d;
-        for (int i = 0; i < len; i++) {
-            wtsum += weight[i];
-            double tmp = Math.pow(frag_a[0][i] - frag_b[0][i], 2)
-                    + Math.pow(frag_a[1][i] - frag_b[1][i], 2)
-                    + Math.pow(frag_a[2][i] - frag_b[2][i], 2);
-            weuc_dist += weight[i] * tmp;
-            euc_dist += tmp;
-        }
-
         System.out.println("Coords 2 after rotation:");
-        print(frag_b, len);
+        print(res.coords2Rotated, len);
 
-        System.out.println("Explicit Weighted RMSD calculated from transformed coords: " + Math.sqrt(euc_dist / wtsum));
-        double rmsd =  Math.sqrt(euc_dist / (double) len);
-        System.out.println("Explicit RMSD calculated from transformed coords: " + rmsd);
+        System.out.println("Explicit Weighted RMSD calculated from transformed coords: " + res.wrmsd);
+        System.out.println("Explicit RMSD calculated from transformed coords: " + res.rmsd);
         // 0.7191064509622259
         double expectedRMSD = 0.719106d;
-        assertTrue(Math_Double.equals(expectedRMSD, rmsd, epsilon));
+        assertTrue(Math_Double.equals(expectedRMSD, res.rmsd, epsilon));
         
     }
 
