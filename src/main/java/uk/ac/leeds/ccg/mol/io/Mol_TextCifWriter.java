@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.leeds.ccg.generic.core.Generic_Strings;
 import uk.ac.leeds.ccg.generic.io.Generic_IO;
 import uk.ac.leeds.ccg.mol.core.Mol_Environment;
 import uk.ac.leeds.ccg.mol.core.Mol_Strings;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
+import uk.ac.leeds.ccg.mol.data.cif.Column;
 import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
 import uk.ac.leeds.ccg.mol.data.cif.Columns;
 import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
@@ -40,7 +42,9 @@ import uk.ac.leeds.ccg.mol.data.cif.columns.Database_PDB_Caveat;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Entity;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Name_Com;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Poly;
+import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Src_Gen;
 import uk.ac.leeds.ccg.mol.data.cif.columns.NDB_Struct_NA_Base_Pair_Step;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Entity_NonPoly;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Conn;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Ref;
 import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Entity_Assembly;
@@ -63,7 +67,7 @@ public class Mol_TextCifWriter {
     public Mol_TextCifWriter() {
         padding = new HashMap<>();
         String s = "";
-        for (int i = 0; i < 80; i++) {
+        for (int i = 0; i < LINE_CHAR_LENGTH_MAX; i++) {
             padding.put(i, s);
             s += Mol_Strings.symbol_space;
         }
@@ -74,7 +78,7 @@ public class Mol_TextCifWriter {
      * @param dir The directory to write to.
      * @param pdbId The first part of the filename.
      * @param name The second part of the filename.
-     * @throws IOException 
+     * @throws IOException
      */
     public void write(CIF cif, Path dir, String pdbId, String name) throws IOException {
         // Print/write from the in memory representation.
@@ -115,7 +119,7 @@ public class Mol_TextCifWriter {
                                     StringBuilder sb = new StringBuilder();
                                     cols.keySet().forEach(cid -> {
                                         Value v = cols.get(cid);
-                                        uk.ac.leeds.ccg.mol.data.cif.Column column = columns.columns.get(cid);
+                                        Column column = columns.columns.get(cid);
                                         int w = column.getWidth();
                                         int sw = v.v.length();
                                         String pad = padding.get(w - sw + 1);
@@ -134,20 +138,28 @@ public class Mol_TextCifWriter {
                                                     addMultiline1(sb, sw, v.v);
                                                 }
                                             } else if (columns.name.equalsIgnoreCase(Database_PDB_Caveat.NAME)) {
-                                                 addMultiline1(sb, sw, v.v);
-                                            } else {
-                                                addMultiline0(sb, sw, v.v);
-                                                if (columns.name.equalsIgnoreCase(Struct_Ref.NAME)) {
+                                                addMultiline1(sb, sw, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(Entity.NAME) ||
+                                                    columns.name.equalsIgnoreCase(PDBX_Entity_NonPoly.NAME)) {
+                                                if (sbss[sbss.length - 1].length() + sw > 131) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
+                                                add_s_pad(sb, pad, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(Entity_Poly.NAME)) {
+                                                addMultiline0(sb, sw, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(Struct_Ref.NAME)) {
+                                                addMultiline0(sb, sw, v.v);
+                                                sb.append(Mol_Environment.EOL);
+                                            } else {
+                                                addMultiline0(sb, sw, v.v);
                                             }
                                         } else {
                                             // Handle special cases:
                                             if (columns.name.equalsIgnoreCase(Entity.NAME)) {
-                                                add_s_pad(sb, pad, v.v);
-                                                if (sw + sbss[sbss.length - 1].length() > 130) {
+                                                if (sbss[sbss.length - 1].length() + sw > 131) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Entity_Name_Com.NAME)) {
                                                 if (sw + sbs.length() > 130) {
                                                     if (sbs.endsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
@@ -161,8 +173,6 @@ public class Mol_TextCifWriter {
                                                     || columns.name.equalsIgnoreCase(Struct_Conn.NAME)) {
                                                 if (sbss[sbss.length - 1].length() + sw > 131) {
                                                     sb.append(Mol_Environment.EOL);
-                                                } else {
-                                                     int debug = 1;
                                                 }
                                                 if (column.name.equalsIgnoreCase("details") || column.name.equalsIgnoreCase("pdbx_dist_value")) {
                                                     pad = " ";
@@ -186,6 +196,11 @@ public class Mol_TextCifWriter {
                                                             sb.append(Mol_Environment.EOL);
                                                         }
                                                     }
+                                                }
+                                                add_s_pad(sb, pad, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(Entity_Src_Gen.NAME)) {
+                                                if (sbss[sbss.length - 1].length() + sw > 131) {
+                                                    sb.append(Mol_Environment.EOL);
                                                 }
                                                 add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Citation_Author.NAME) && column.name.equalsIgnoreCase("name")) {
@@ -259,7 +274,7 @@ public class Mol_TextCifWriter {
             bw.write(Mol_Environment.EOL);
         }
     }
-    
+
     /**
      * @param sb The StringBuilder.
      * @param sw The length of s.
@@ -269,20 +284,35 @@ public class Mol_TextCifWriter {
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
         String ss = s.substring(0, CIF.HEADER_LENGTH_MAX);
-        sb.append(ss);
-        sb.append(Mol_Environment.EOL);
-        String sv = s.substring(CIF.HEADER_LENGTH_MAX, sw);
+        String sv = splitAndAppend(sb, s, ss);
         while (sv.length() > CIF.HEADER_LENGTH_MAX) {
             ss = sv.substring(0, CIF.HEADER_LENGTH_MAX);
-            sb.append(ss);
-            sb.append(Mol_Environment.EOL);
-            sv = sv.substring(CIF.HEADER_LENGTH_MAX, sv.length());
+            sv = splitAndAppend(sb, sv, ss);
         }
         sb.append(sv);
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
     }
-    
+
+    /**
+     * @param sb The StringBuilder.
+     * @param s A string.
+     * @param ss The first CIF.HEADER_LENGTH_MAX characters of s.
+     * @return A next sub-string of s.
+     */
+    protected String splitAndAppend(StringBuilder sb, String s, String ss) {
+        if (Generic_Strings.countChars(ss, '(') != Generic_Strings.countChars(ss, ')')) {
+            int li = ss.lastIndexOf('(');
+            ss = ss.substring(0, li);
+            s = s.substring(li, s.length());
+        } else {
+            s = s.substring(CIF.HEADER_LENGTH_MAX, s.length());
+        }
+        sb.append(ss);
+        sb.append(Mol_Environment.EOL);
+        return s;
+    }
+
     /**
      * @param sb The StringBuilder.
      * @param sw The length of s.

@@ -49,7 +49,7 @@ public class IOCheck {
      *
      * @param args
      */
-    public static void main(String[] args) {  
+    public static void main(String[] args) {        
         try {
             Mol_TextCifReader reader = new Mol_TextCifReader();
             Mol_TextCifWriter writer = new Mol_TextCifWriter();
@@ -59,8 +59,8 @@ public class IOCheck {
 //            String pdbid = "6xu8";
 //            String pdbid = "6xyw";
 //            String pdbid = "6xu6";
-            String pdbid = "8scb";
-//            String pdbid = "7qwq";
+//             String pdbid = "8scb";
+            String pdbid = "7qwq";
 //            String pdbid = "8ccs";
 //            String pdbid = "4v88";
 //            String pdbid = "6fxc";

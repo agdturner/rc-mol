@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif.data_items;
+package uk.ac.leeds.ccg.mol.data.cif.columns;
 
-import uk.ac.leeds.ccg.mol.data.cif.DataItems;
-import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
-import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 
 /**
- * Symmetry DataItems.
+ * PDBX_Validate_Planes Columns.
  * @author Andy Turner
  */
-public class Symmetry extends DataItems {
+public class PDBX_Validate_Planes extends Columns {
     
     /**
-     * "symmetry"
+     * "pdbx_validate_planes"
      */
-    public static String NAME = "symmetry";
+    public static String NAME = "pdbx_validate_planes";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Symmetry(DataItems_ID id) {
-        super(Symmetry.NAME, id);
+    public PDBX_Validate_Planes(Columns_ID id) {
+        super(NAME, id);
     }
     
 }

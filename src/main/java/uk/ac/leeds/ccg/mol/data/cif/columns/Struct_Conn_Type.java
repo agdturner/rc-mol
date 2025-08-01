@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.ac.leeds.ccg.mol.data.cif.data_items;
+package uk.ac.leeds.ccg.mol.data.cif.columns;
 
-import uk.ac.leeds.ccg.mol.data.cif.DataItems;
-import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
-import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Columns_ID;
 
 /**
- * Symmetry DataItems.
+ * Struct_Conn_Type Columns.
  * @author Andy Turner
  */
-public class Symmetry extends DataItems {
+public class Struct_Conn_Type extends Columns {
     
     /**
-     * "symmetry"
+     * "struct_conn_type"
      */
-    public static String NAME = "symmetry";
+    public static String NAME = "struct_conn_type";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Symmetry(DataItems_ID id) {
-        super(Symmetry.NAME, id);
+    public Struct_Conn_Type(Columns_ID id) {
+        super(NAME, id);
     }
     
 }

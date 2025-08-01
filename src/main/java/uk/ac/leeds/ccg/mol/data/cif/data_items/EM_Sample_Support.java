@@ -17,25 +17,24 @@ package uk.ac.leeds.ccg.mol.data.cif.data_items;
 
 import uk.ac.leeds.ccg.mol.data.cif.DataItems;
 import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
-import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
 
 /**
- * Symmetry DataItems.
+ * EM_Sample_Support DataItems.
  * @author Andy Turner
  */
-public class Symmetry extends DataItems {
+public class EM_Sample_Support extends DataItems {
     
     /**
-     * "symmetry"
+     * "em_sample_support"
      */
-    public static String NAME = "symmetry";
+    public static String NAME = "em_sample_support";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Symmetry(DataItems_ID id) {
-        super(Symmetry.NAME, id);
+    public EM_Sample_Support(DataItems_ID id) {
+        super(NAME, id);
     }
     
 }

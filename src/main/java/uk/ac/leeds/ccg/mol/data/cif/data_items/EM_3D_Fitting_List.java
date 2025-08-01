@@ -17,25 +17,24 @@ package uk.ac.leeds.ccg.mol.data.cif.data_items;
 
 import uk.ac.leeds.ccg.mol.data.cif.DataItems;
 import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
-import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
 
 /**
- * Symmetry DataItems.
+ * EM_3D_Fitting_List DataItems.
  * @author Andy Turner
  */
-public class Symmetry extends DataItems {
+public class EM_3D_Fitting_List extends DataItems {
     
     /**
-     * "symmetry"
+     * "em_3d_fitting_list"
      */
-    public static String NAME = "symmetry";
+    public static String NAME = "em_3d_fitting_list";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Symmetry(DataItems_ID id) {
-        super(Symmetry.NAME, id);
+    public EM_3D_Fitting_List(DataItems_ID id) {
+        super(NAME, id);
     }
     
 }

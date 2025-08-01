@@ -17,25 +17,24 @@ package uk.ac.leeds.ccg.mol.data.cif.data_items;
 
 import uk.ac.leeds.ccg.mol.data.cif.DataItems;
 import uk.ac.leeds.ccg.mol.data.cif.DataItems_ID;
-import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Sheet_Order;
 
 /**
- * Symmetry DataItems.
+ * PDBX_Contact_Author DataItems.
  * @author Andy Turner
  */
-public class Symmetry extends DataItems {
+public class PDBX_Contact_Author extends DataItems {
     
     /**
-     * "symmetry"
+     * "pdbx_contact_author"
      */
-    public static String NAME = "symmetry";
+    public static String NAME = "pdbx_contact_author";
     
     /**
      * Create a new instance.
      * @param id What {@link #id} is set to.
      */
-    public Symmetry(DataItems_ID id) {
-        super(Symmetry.NAME, id);
+    public PDBX_Contact_Author(DataItems_ID id) {
+        super(NAME, id);
     }
     
 }

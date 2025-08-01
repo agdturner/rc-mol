@@ -34,7 +34,7 @@ public class Struct_Sheet_Range extends Columns {
      * @param id What {@link #id} is set to.
      */
     public Struct_Sheet_Range(Columns_ID id) {
-        super(Struct_Sheet_Order.NAME, id);
+        super(Struct_Sheet_Range.NAME, id);
     }
     
 }
