@@ -53,7 +53,17 @@
  */
 package uk.ac.leeds.ccg.mol.geom;
 
+import ch.obermuhlner.math.big.BigRational;
+import java.math.RoundingMode;
+import java.util.TreeSet;
+import uk.ac.leeds.ccg.math.arithmetic.Math_BigRational;
 import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
+import uk.ac.leeds.ccg.mol.data.cif.CIF;
+import uk.ac.leeds.ccg.mol.data.cif.Column;
+import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
+import uk.ac.leeds.ccg.mol.data.cif.Columns;
+import uk.ac.leeds.ccg.mol.data.cif.Row_ID;
+import uk.ac.leeds.ccg.mol.data.cif.Value;
 
 /**
  *
@@ -64,22 +74,22 @@ public class QCProt {
     /**
      * The quaternion components.
      */
-    double q1, q2, q3, q4;
+    public double q1, q2, q3, q4;
 
     /**
      * For storing the root mean squared error.
      */
-    double rmsd;
+    public double rmsd;
 
     /**
      * For storing the weighted root mean squared error.
      */
-    double wrmsd;
+    public double wrmsd;
 
     /**
      * For storing the rotation matrix.
      */
-    double[] rotmat;
+    public double[] rotmat;
 
     /**
      * For storing the weights.
@@ -87,7 +97,7 @@ public class QCProt {
     double[] weight;
 
     /**
-     * For storing the rotated coordinates.
+     * The coordinates to orientate to.
      */
     double[][] coords1;
 
@@ -110,10 +120,20 @@ public class QCProt {
      * For storing the number of coordinates as a double.
      */
     double n;
-
+    
     /**
-     * Create a new instance. The parameters coords1 and coords2 are expected to
-     * have the same dimensions. The respective x, y and z coordinates for the
+     * Create a new instance. 
+     *
+     * @param cif1 The CIF with coordinates to fit to.
+     * @param cif2 The CIF with coordinates to be fitted.
+     * @param atomTypes If null then all atom types are used. 
+     */
+    public QCProt(CIF cif1, CIF cif2, TreeSet<String> atomTypes) {
+        this(cif1.getCoords(atomTypes), cif2.getCoords(atomTypes));
+    }
+    
+    /**
+     * Create a new instance. The respective x, y and z coordinates for the
      * point are in: coords1[0] and coords2[0], coords1[1] and coords2[1], and
      * coords1[2] and coords1[3]. The order of these must be consistent between
      * the two sets of points, but these can be in any order. are the x, y and z
@@ -126,7 +146,7 @@ public class QCProt {
         rotmat = new double[9];
         this.coords1 = coords1;
         this.coords2 = coords2;
-        this.len = coords1[0].length;
+        this.len = Math.min(coords1[0].length, coords2[0].length);
         double wsum = len;
 
         double[] A = new double[9];
@@ -135,7 +155,9 @@ public class QCProt {
 
         /* calculate the RMSD & rotational matrix */
         fastCalcRMSDAndRotation(A, E0, wsum, -1, -1d);
+    }
 
+    public double[][] getRotatedCoordinates() {
         /* apply rotation matrix */
         coords2Rotated = new double[3][len];
         for (int i = 0; i < len; i++) {
@@ -161,6 +183,7 @@ public class QCProt {
         //System.out.println("Explicit Weighted RMSD calculated from transformed coords: " + wrmsd);
         rmsd = Math.sqrt(euc_dist / (double) len);
         //System.out.println("Explicit RMSD calculated from transformed coords: " + rmsd);
+        return coords2Rotated;
     }
 
     /**

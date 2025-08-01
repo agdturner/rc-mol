@@ -51,14 +51,8 @@ import static uk.ac.leeds.ccg.mol.run.IO_WithCIFTools_Example.LINE_CHAR_LENGTH_M
  *
  * @author Andy Turner
  */
-public class Mol_TextCifWriter {
+public class Mol_TextCifWriterOld {
     
-    public static int LINE_CHAR_LENGTH_MAX = 2048;
-
-    public static int NAME_CODE_LENGTH_MAX = 75;
-
-    public static int HEADER_LENGTH_MAX = 80;
-
     /**
      * The path for IO.
      */
@@ -71,7 +65,7 @@ public class Mol_TextCifWriter {
     
     public final CifOptions options;
 
-    public Mol_TextCifWriter(CifOptions options) {
+    public Mol_TextCifWriterOld(CifOptions options) {
         this.options = options;
     }
 
@@ -310,7 +304,7 @@ public class Mol_TextCifWriter {
     }
 
     private static final List<String> PADDING_SPACES = IntStream.range(0, 80)
-        .mapToObj(Mol_TextCifWriter::whitespaceString)
+        .mapToObj(Mol_TextCifWriterOld::whitespaceString)
         .collect(Collectors.toList());
 
     private static String whitespaceString(int width) {
@@ -332,7 +326,7 @@ public class Mol_TextCifWriter {
     }
 
     public static void main(String[] args) {
-        Mol_TextCifWriter ex = new Mol_TextCifWriter(CifOptions.builder().build());
+        Mol_TextCifWriterOld ex = new Mol_TextCifWriterOld(CifOptions.builder().build());
         try {
             //String pdbId = "4ug0";
             String pdbId = "6xu8";
