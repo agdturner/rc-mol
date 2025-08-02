@@ -139,13 +139,20 @@ public class CIF extends Mol_Object {
         Column_ID z_cid = columns.name2id.get("Cartn_z");
         Column z_column = columns.getColumn(z_cid);
         
+        int oom = -3;
         for (var rid : x_column.values.keySet()) {
             double x = Double.parseDouble(x_column.values.get(rid).v);
             double y = Double.parseDouble(y_column.values.get(rid).v);
             double z = Double.parseDouble(z_column.values.get(rid).v);
-            columns.setValue(rid, x_cid, new Value(Double.toString(rotmat[0] * x + rotmat[1] * y + rotmat[2] * z)));
-            columns.setValue(rid, y_cid, new Value(Double.toString(rotmat[3] * x + rotmat[4] * y + rotmat[5] * z)));
-            columns.setValue(rid, z_cid, new Value(Double.toString(rotmat[6] * x + rotmat[7] * y + rotmat[8] * z)));
+            //columns.setValue(rid, x_cid, new Value(Double.toString(rotmat[0] * x + rotmat[1] * y + rotmat[2] * z)));
+            //columns.setValue(rid, y_cid, new Value(Double.toString(rotmat[3] * x + rotmat[4] * y + rotmat[5] * z)));
+            //columns.setValue(rid, z_cid, new Value(Double.toString(rotmat[6] * x + rotmat[7] * y + rotmat[8] * z)));
+            columns.setValue(rid, x_cid, new Value(Math_BigRational.round(
+                    BigRational.valueOf(rotmat[0] * x + rotmat[1] * y + rotmat[2] * z), oom, RoundingMode.UP).toPlainString()));
+            columns.setValue(rid, y_cid, new Value(Math_BigRational.round(
+                    BigRational.valueOf(rotmat[3] * x + rotmat[4] * y + rotmat[5] * z), oom, RoundingMode.UP).toPlainString()));
+            columns.setValue(rid, z_cid, new Value(Math_BigRational.round(
+                    BigRational.valueOf(rotmat[6] * x + rotmat[7] * y + rotmat[8] * z), oom, RoundingMode.UP).toPlainString()));
         }
         
     }
@@ -200,12 +207,14 @@ public class CIF extends Mol_Object {
         //System.out.println("x average " + x_average);
         //System.out.println("y average " + y_average);
         //System.out.println("z average " + z_average);
+        
+        int oom = -3;
 
         // Translate all coordinates so that the average is the centre.
         for (var rid : x_column.values.keySet()) {
-            BigRational x = Math_BigRational.round(BigRational.valueOf(x_column.values.get(rid).v).subtract(x_average), -3, RoundingMode.UP);
-            BigRational y = Math_BigRational.round(BigRational.valueOf(y_column.values.get(rid).v).subtract(y_average), -3, RoundingMode.UP);
-            BigRational z = Math_BigRational.round(BigRational.valueOf(z_column.values.get(rid).v).subtract(z_average), -3, RoundingMode.UP);
+            BigRational x = Math_BigRational.round(BigRational.valueOf(x_column.values.get(rid).v).subtract(x_average), oom, RoundingMode.UP);
+            BigRational y = Math_BigRational.round(BigRational.valueOf(y_column.values.get(rid).v).subtract(y_average), oom, RoundingMode.UP);
+            BigRational z = Math_BigRational.round(BigRational.valueOf(z_column.values.get(rid).v).subtract(z_average), oom, RoundingMode.UP);
             columns.setValue(rid, x_cid, new Value(x.toPlainString()));
             columns.setValue(rid, y_cid, new Value(y.toPlainString()));
             columns.setValue(rid, z_cid, new Value(z.toPlainString()));

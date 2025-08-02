@@ -58,16 +58,15 @@ public class Align {
 //        String pdbid2 = "6xu8";
 //        String pdbid2 = "6xyw";
 //        String pdbid2 = "6xu6";
-        String pdbid2 = "8scb";
+//        String pdbid2 = "8scb";
 //        String pdbid2 = "7qwq";
 //        String pdbid2 = "8ccs";
-//        String pdbid2 = "4v88";
+        String pdbid2 = "4v88";
 //        String pdbid2 = "6fxc";
         
-        CIF cif1 = null;
         //CIF cif1 = reader.getCif(pdbid1 + "_centralised", dir);
         //CIF cif2 = reader.getCif(pdbid2 + "_centralised", dir);
-        //CIF cif1 = reader.getCif(pdbid1, dir);
+        CIF cif1 = reader.getCif(pdbid1, dir);
         CIF cif2 = reader.getCif(pdbid2, dir);
         //cif1.centralise(null);
         //cif2.centralise(null);

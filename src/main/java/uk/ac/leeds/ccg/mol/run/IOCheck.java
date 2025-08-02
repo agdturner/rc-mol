@@ -20,13 +20,9 @@ import uk.ac.leeds.ccg.mol.io.Mol_TextCifReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
-import uk.ac.leeds.ccg.mol.geom.QCProt;
 
 /**
  *
@@ -60,9 +56,9 @@ public class IOCheck {
 //            String pdbid = "6xyw";
 //            String pdbid = "6xu6";
 //             String pdbid = "8scb";
-            String pdbid = "7qwq";
+//            String pdbid = "7qwq";
 //            String pdbid = "8ccs";
-//            String pdbid = "4v88";
+            String pdbid = "4v88";
 //            String pdbid = "6fxc";
 
             CIF cif = reader.getCif(pdbid, dir);
