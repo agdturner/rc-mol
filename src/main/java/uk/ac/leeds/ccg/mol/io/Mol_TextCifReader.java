@@ -348,7 +348,7 @@ public class Mol_TextCifReader {
         } else if (name.equalsIgnoreCase(PDBX_Entry_Details.NAME)) {
             r = new PDBX_Entry_Details(id);
         } else if (name.equalsIgnoreCase(uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Validate_Planes.NAME)) {
-            r = new uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Validate_Planes(id);    
+            r = new uk.ac.leeds.ccg.mol.data.cif.data_items.PDBX_Validate_Planes(id);
         } else if (name.equalsIgnoreCase(PDBX_Validate_Peptide.NAME)) {
             r = new PDBX_Validate_Peptide(id);
         } else if (name.equalsIgnoreCase(Struct_Conn_Type.NAME)) {
@@ -469,7 +469,7 @@ public class Mol_TextCifReader {
             r = new uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Struct_Assembly(id);
         } else if (name.equalsIgnoreCase(uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Struct_Assembly_Gen.NAME)) {
             r = new uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Struct_Assembly_Gen(id);
-            
+
         } else if (name.equalsIgnoreCase(Struct_Conf.NAME)) {
             r = new Struct_Conf(id);
         } else if (name.equalsIgnoreCase(Struct_Conn.NAME)) {
@@ -524,10 +524,10 @@ public class Mol_TextCifReader {
             r = new PDBX_Unobs_Or_Zero_Occ_Residues(id);
         } else if (name.equalsIgnoreCase(Chem_Comp_Bond.NAME)) {
             r = new Chem_Comp_Bond(id);
-        } else if (name.equalsIgnoreCase( uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_Molwt.NAME)) {
-            r = new  uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_Molwt(id);
-        } else if (name.equalsIgnoreCase( uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_NaturalSource.NAME)) {
-            r = new  uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_NaturalSource(id);
+        } else if (name.equalsIgnoreCase(uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_Molwt.NAME)) {
+            r = new uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_Molwt(id);
+        } else if (name.equalsIgnoreCase(uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_NaturalSource.NAME)) {
+            r = new uk.ac.leeds.ccg.mol.data.cif.columns.EM_Entity_Assembly_NaturalSource(id);
         } else if (name.equalsIgnoreCase(EM_Entity_Assembly_Recombinant.NAME)) {
             r = new EM_Entity_Assembly_Recombinant(id);
         } else if (name.equalsIgnoreCase(EM_Software.NAME)) {
@@ -593,77 +593,33 @@ public class Mol_TextCifReader {
                 columns.addColumn(new Column(columns, parts[1].trim()));
                 //columns.cols.put(new Column_ID(columns.cols.size()),
                 //        new Column(columns, parts[1].trim()));
-                line = reader.readLine();
+                line = reader.readLine().trim();
                 //System.out.println(line);
             }
 
+            if (line.trim().equalsIgnoreCase(";")) {
+                int debug = 1;
+            }
+
             // Add values
+            int ncols = columns.getNCols();
             int row = 0;
-            while (!(line.startsWith(Mol_Strings.symbol_underscore)
-                    || line.startsWith(Mol_Strings.SYMBOL_HASH))) {
-                ArrayList<String> values = getValues(line.trim());
+            while (!line.equalsIgnoreCase(Mol_Strings.SYMBOL_HASH)) {
+                ArrayList<String> values = readRow(line, ncols);
                 Row_ID rid = new Row_ID(row);
-                while (values.size() != columns.getNCols()) {
-                    /**
-                     * This may occur where the next variable is on the next
-                     * line which should start with ";".
-                     */
-                    String line2 = reader.readLine();
-                    //System.out.println(line2);
-                    if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                        Column_ID cid = new Column_ID(values.size());
-                        Column column = columns.columns.get(cid);
-                        if (column == null) {
-                            int debug = 1;
-                        }
-                        if (column.name.equalsIgnoreCase("name")) {
-                            values.add(line2.substring(1)); // Strip off the semi-colon.
-                            String line3 = reader.readLine();
-                            //System.out.println(line3);
-                            if (line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                                if (values.size() != columns.getNCols()) {
-                                    String line4 = reader.readLine();
-                                    //System.out.println(line4);
-                                    values.addAll(getValues(line4));
-                                    if (values.size() != columns.getNCols()) {
-                                        int debug = 1;
-                                    }
-                                }
-                            }
-                        } else if (column.name.equalsIgnoreCase("pdbx_seq_one_letter_code")
-                                || column.name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
-                            StringBuilder sb2 = new StringBuilder(line2.substring(1));
-                            if (!line2.contains("\\s+") && line2.length() == 81) {
-                                readMultiLine(sb2);
-                            }
-                            values.add(sb2.toString());
-                        } else {
-                            String line3 = reader.readLine().trim();
-                            //System.out.println(line3);
-                            line2 = line2.substring(1);
-                            while (!line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
-                                line2 += line3;
-                                line3 = reader.readLine().trim();
-                                //System.out.println(line3);
-                            }
-                            values.add(line2);                            
-                        }
-                    } else {
-                        // There are cases where there is no line continuation symbol!
-                        values.addAll(getValues(line2));
-                        if (values.size() != columns.getNCols()) {
-                            int debug = 1;
-                        }
-                    }
+
+                if (values.size() != ncols) {
+                    int debug = 1;
                 }
+
                 columns.data.put(rid, new TreeMap<>());
-                for (int col = 0; col < values.size(); col++) {
+
+                for (int col = 0; col < ncols; col++) {
                     Column_ID cid = new Column_ID(col);
                     columns.setValue(rid, cid, new Value(values.get(col)));
                 }
-                line = reader.readLine();
-                //System.out.println(line);
                 row++;
+                line = reader.readLine().trim();
             }
 
         } catch (Exception e) {
@@ -671,6 +627,103 @@ public class Mol_TextCifReader {
             e.printStackTrace();
         }
     }
+
+    protected ArrayList<String> readRow(String line, int ncols) throws IOException {
+        ArrayList<String> values = new ArrayList<>(ncols);
+        if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+            readMultiline(values, line, ncols);
+        } else {
+            values.addAll(getValues(line));
+        }
+        while (values.size() != ncols) {
+            finishRead(values, ncols);
+        }
+        return values;
+    }
+
+    public void finishRead(ArrayList<String> values, int ncols) throws IOException {
+        String line2 = reader.readLine().trim();
+        if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+            readMultiline(values, line2, ncols);
+        } else {
+            values.addAll(getValues(line2));
+        }
+    }
+
+    protected void readMultiline(ArrayList<String> values, String line, int ncols)
+            throws IOException {
+        String line2 = reader.readLine();
+        if (line2.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+            values.add(line.substring(1));
+            while (values.size() != ncols) {
+                finishRead(values, ncols);
+            }
+        } else {
+            readMultiline(values, line.concat(line2), ncols);
+        }
+    }
+//           while (values.size() != columns.getNCols()) {
+//                Column_ID cid = new Column_ID(values.size());
+//                Column column = columns.columns.get(cid);
+//                if (column == null) {
+//                    int debug = 1;
+//                }
+//                if (column.name.equalsIgnoreCase("name")) {
+//                    values.add(line2.substring(1)); // Strip off the semi-colon.
+//                    String line3 = reader.readLine();
+//                    //System.out.println(line3);
+//                    if (line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+//                        if (values.size() != columns.getNCols()) {
+//                            String line4 = reader.readLine();
+//                            //System.out.println(line4);
+//                            values.addAll(getValues(line4));
+//                            if (values.size() != columns.getNCols()) {
+//                                int debug = 1;
+//                            }
+//                        }
+//                    }
+//                } else if (column.name.equalsIgnoreCase("pdbx_seq_one_letter_code")
+//                        || column.name.equalsIgnoreCase("pdbx_seq_one_letter_code_can")) {
+//                    StringBuilder sb2 = new StringBuilder(line2.substring(1));
+//                    if (!line2.contains("\\s+") && line2.length() == 81) {
+//                        readMultiLine(sb2);
+//                    }
+//                    values.add(sb2.toString());
+//                } else {
+//                    String line3 = reader.readLine().trim();
+//                    //System.out.println(line3);
+//                    line2 = line2.substring(1);
+//                    while (!line3.equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
+//                        line2 += line3;
+//                        line3 = reader.readLine().trim();
+//                        //System.out.println(line3);
+//                    }
+//                    values.add(line2);
+//                }
+//            } else {
+//                // There are cases where there is no line continuation symbol!
+//                values.addAll(getValues(line2));
+//                if (values.size() != columns.getNCols()) {
+//                    int debug = 1;
+//                }
+//            }
+//        }
+//    }
+//
+//    columns.data.put (rid, 
+//
+//    new TreeMap <>  () 
+//        );
+//                for (int col = 0; col < values.size(); col++) {
+//            Column_ID cid = new Column_ID(col);
+//            columns.setValue(rid, cid, new Value(values.get(col)));
+//        }
+//        line = reader.readLine();
+//
+//        if (line.trim().equalsIgnoreCase(";")) {
+//            line = reader.readLine();
+//        }
+//    }
 
     protected void readMultiLine(StringBuilder sb) throws IOException {
         String line = reader.readLine().trim();

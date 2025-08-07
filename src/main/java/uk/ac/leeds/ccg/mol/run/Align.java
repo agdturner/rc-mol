@@ -62,17 +62,17 @@ public class Align {
 //        String pdbid2 = "7qwq";
 //        String pdbid2 = "8ccs";
         String pdbid2 = "4v88";
-//        String pdbid2 = "6fxc";
+        //String pdbid2 = "6fxc";
         
-        //CIF cif1 = reader.getCif(pdbid1 + "_centralised", dir);
+        CIF cif1 = reader.getCif(pdbid1 + "_centralised", dir);
         //CIF cif2 = reader.getCif(pdbid2 + "_centralised", dir);
-        CIF cif1 = reader.getCif(pdbid1, dir);
+        //CIF cif1 = reader.getCif(pdbid1, dir);
         CIF cif2 = reader.getCif(pdbid2, dir);
         //cif1.centralise(null);
         //cif2.centralise(null);
         TreeSet<String> atomTypes = new TreeSet<>();
         atomTypes.add("P");
-        cif1.centralise(atomTypes);
+        //cif1.centralise(atomTypes);
         cif2.centralise(atomTypes);
         String atomTypesString = "_";
         Iterator<String> ite = atomTypes.iterator();
@@ -80,7 +80,7 @@ public class Align {
             atomTypesString += ite.next();
         }
         String name = atomTypesString + "_centralised";
-        writer.write(cif1, dir, pdbid1, name);
+        //writer.write(cif1, dir, pdbid1, name);
         writer.write(cif2, dir, pdbid2, name);
         
         QCProt qcprot = new QCProt(cif1, cif2, atomTypes);

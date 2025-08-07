@@ -153,6 +153,11 @@ public class Mol_TextCifWriter {
                                                     add_s_pad(sb, pad, v.v);
                                                 }
                                             } else if (columns.name.equalsIgnoreCase(Entity_Poly.NAME)) {
+
+                                                if (v.v.contains(";;")) {
+                                                    int debug = 1;
+                                                }
+
                                                 addMultiline0(sb, sw, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Struct_Ref.NAME)) {
                                                 addMultiline0(sb, sw, v.v);
@@ -214,6 +219,11 @@ public class Mol_TextCifWriter {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
                                                 pad = " ";
+
+                                                if (v.v.contains(";;")) {
+                                                    int debug = 1;
+                                                }
+
                                                 add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Entity_Src_Gen.NAME)) {
                                                 if (sbss[sbss.length - 1].length() + sw > 131) {
@@ -240,6 +250,11 @@ public class Mol_TextCifWriter {
                                     sb.append(Mol_Environment.EOL);
                                     try {
                                         //System.out.print(sb.toString());
+
+                                        if (sb.toString().contains(";;")) {
+                                            int debug = 1;
+                                        }
+
                                         bw.write(sb.toString());
                                     } catch (IOException ex1) {
                                         Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
@@ -310,7 +325,7 @@ public class Mol_TextCifWriter {
     protected void addMultiline0(StringBuilder sb, int sw, String s) {
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-        if (s.contains("(") && Generic_Strings.countChars(s, '(') == Generic_Strings.countChars(s, ')')) {        
+        if (s.contains("(") && Generic_Strings.countChars(s, '(') == Generic_Strings.countChars(s, ')')) {
             String ss = s.substring(0, CIF.HEADER_LENGTH_MAX);
             String sv = splitAndAppend(sb, s, ss);
             while (sv.length() > CIF.HEADER_LENGTH_MAX) {
@@ -333,6 +348,10 @@ public class Mol_TextCifWriter {
         }
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+
+        if (sb.toString().contains(";;")) {
+            int debug = 1;
+        }
     }
 
     /**
