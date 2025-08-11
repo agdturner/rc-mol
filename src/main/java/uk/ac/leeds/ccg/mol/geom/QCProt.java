@@ -106,11 +106,6 @@ public class QCProt {
      * For storing the number of coordinates.
      */
     int len;
-
-    /**
-     * For storing the number of coordinates as a double.
-     */
-    double n;
     
     /**
      * Create a new instance. 
@@ -137,15 +132,13 @@ public class QCProt {
         rotmat = new double[9];
         this.coords1 = coords1;
         this.coords2 = coords2;
-        this.len = Math.min(coords1[0].length, coords2[0].length);
-        double wsum = len;
-
+        len = Math.min(coords1[0].length, coords2[0].length);
         double[] A = new double[9];
         /* calculate the (weighted) inner product of two structures */
         double E0 = innerProduct(A);
 
         /* calculate the RMSD & rotational matrix */
-        fastCalcRMSDAndRotation(A, E0, wsum, -1, -1d);
+        fastCalcRMSDAndRotation(A, E0, -1d);
     }
 
     public double[][] getRotatedCoordinates() {
@@ -158,21 +151,21 @@ public class QCProt {
         }
 
         /* calculate euclidean distance */
-        double euc_dist = 0d;
-        double weuc_dist = 0d;
-        double wtsum = 0d;
+        double sdist = 0d;
+        double swdist = 0d;
+        double wsum = 0d;
         for (int i = 0; i < len; i++) {
-            wtsum += weight[i];
-            double tmp = Math.pow(coords1[0][i] - coords2Rotated[0][i], 2)
+            wsum += weight[i];
+            double dist = Math.pow(coords1[0][i] - coords2Rotated[0][i], 2)
                     + Math.pow(coords1[1][i] - coords2Rotated[1][i], 2)
                     + Math.pow(coords1[2][i] - coords2Rotated[2][i], 2);
-            weuc_dist += weight[i] * tmp;
-            euc_dist += tmp;
+            swdist += weight[i] * dist;
+            sdist += dist;
         }
 
-        wrmsd = Math.sqrt(euc_dist / wtsum);
+        wrmsd = Math.sqrt(swdist / wsum);
         //System.out.println("Explicit Weighted RMSD calculated from transformed coords: " + wrmsd);
-        rmsd = Math.sqrt(euc_dist / (double) len);
+        rmsd = Math.sqrt(sdist / (double) len);
         //System.out.println("Explicit RMSD calculated from transformed coords: " + rmsd);
         return coords2Rotated;
     }
@@ -187,7 +180,9 @@ public class QCProt {
      * @param minScore
      * @return
      */
-    protected int fastCalcRMSDAndRotation(double[] A, double E0, double wsum, double len, double minScore) {
+    private int fastCalcRMSDAndRotation(double[] A, double E0, //double wsum, 
+            //double len, 
+            double minScore) {
         double Sxx, Sxy, Sxz, Syx, Syy, Syz, Szx, Szy, Szz;
         double Szz2, Syy2, Sxx2, Sxy2, Syz2, Sxz2, Syx2, Szy2, Szx2,
                 SyzSzymSyySzz2, Sxx2Syy2Szz2Syz2Szy2, Sxy2Sxz2Syx2Szx2,
@@ -388,7 +383,7 @@ public class QCProt {
      * @param A
      * @return
      */
-    protected double innerProduct(double[] A) {
+    private double innerProduct(double[] A) {
         double x1, x2, y1, y2, z1, z2;
         double[] fx1 = coords1[0];
         double[] fy1 = coords1[1];

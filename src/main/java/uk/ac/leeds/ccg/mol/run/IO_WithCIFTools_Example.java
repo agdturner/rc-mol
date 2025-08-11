@@ -84,10 +84,15 @@ public class IO_WithCIFTools_Example {
              */
             CifFile cifFile;
             if (parseBinary) {
-                cifFile = CifIO.readFromURL(new URL("https://models.rcsb.org/" + pdbId + ".bcif"));
+                Path p = Paths.get("https://models.rcsb.org/" + pdbId + ".bcif");
+                cifFile = CifIO.readFromURL(p.toUri().toURL());
+                //https://stackoverflow.com/questions/75966165/how-to-replace-the-deprecated-url-constructors-in-java-20
+                //cifFile = CifIO.readFromURL(new URL("https://models.rcsb.org/" + pdbId + ".bcif"));
             } else {
                 // parse CIF from RCSB PDB
-                cifFile = CifIO.readFromURL(new URL("https://files.rcsb.org/download/" + pdbId + ".cif"));
+                Path p = Paths.get("https://files.rcsb.org/download/" + pdbId + ".cif");
+                cifFile = CifIO.readFromURL(p.toUri().toURL());
+                //cifFile = CifIO.readFromURL(new URL("https://files.rcsb.org/download/" + pdbId + ".cif"));
             }
             // fine-grained options are available in the CifOptions class
 
@@ -600,7 +605,8 @@ public class IO_WithCIFTools_Example {
     public void convertAlphaFold() throws IOException {
         String id = "AF-Q76EI6-F1-model_v4";
 
-        CifFile cifFile = CifIO.readFromURL(new URL("https://alphafold.ebi.ac.uk/files/" + id + ".cif"));
+        //CifFile cifFile = CifIO.readFromURL(new URL("https://alphafold.ebi.ac.uk/files/" + id + ".cif"));
+        CifFile cifFile = CifIO.readFromURL(Paths.get("https://alphafold.ebi.ac.uk/files/" + id + ".cif").toUri().toURL());
         MmCifFile mmCifFile = cifFile.as(StandardSchemata.MMCIF);
 
         // print average quality score
