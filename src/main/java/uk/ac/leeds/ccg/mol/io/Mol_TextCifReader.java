@@ -212,7 +212,7 @@ public class Mol_TextCifReader {
                     } else {
                         // DataItemss
                         if (line.startsWith(Mol_Strings.symbol_underscore)) {
-                            ArrayList<String> values = getValues(line);
+                            ArrayList<String> values = Mol_TextCifReader.this.getValues(line);
                             String[] parts = values.get(0).split("\\."); // Need to escape the dot
                             String name = parts[0].substring(1);
                             String vname = parts[1];
@@ -563,40 +563,34 @@ public class Mol_TextCifReader {
      */
     protected void parseLoop(DataBlock db) {
         try {
-            String line = reader.readLine();
+            String line = reader.readLine().trim();
             //System.out.println(line);
 
-            String[] parts = line.split("\\."); // Need to escape the dot
-
-            if (parts.length == 0) {
-                int debug = 1;
-            }
-
-            if (parts[0].length() == 0) {
-                int debug = 1;
-            }
-
             // Initialise columnss
-            //Columns columns = new Columns(parts[0].substring(1),
-            //        db.getNextColumns_ID());
+            String[] parts = line.split("\\."); // Need to escape the dot.
+            
+            if (parts.length < 2) {
+                int debug = 1;
+            }
+            
             Columns columns = getColumns(parts[0].substring(1),
                     db.getNextColumns_ID());
             db.addColumns(columns);
             // Initialise Columns
             while (line.startsWith(Mol_Strings.symbol_underscore)) {
-                parts = line.split("\\."); // Need to escape the dot
-
+                parts = line.split("\\."); // Need to escape the dot.
+                
                 if (parts.length < 2) {
                     int debug = 1;
                 }
-
+                
                 columns.addColumn(new Column(columns, parts[1].trim()));
                 //columns.cols.put(new Column_ID(columns.cols.size()),
                 //        new Column(columns, parts[1].trim()));
                 line = reader.readLine().trim();
                 //System.out.println(line);
             }
-
+            
             if (line.trim().equalsIgnoreCase(";")) {
                 int debug = 1;
             }
@@ -605,7 +599,7 @@ public class Mol_TextCifReader {
             int ncols = columns.getNCols();
             int row = 0;
             while (!line.equalsIgnoreCase(Mol_Strings.SYMBOL_HASH)) {
-                ArrayList<String> values = readRow(line, ncols);
+                ArrayList<String> values = Mol_TextCifReader.this.getValues(line, ncols);
                 Row_ID rid = new Row_ID(row);
 
                 if (values.size() != ncols) {
@@ -620,6 +614,7 @@ public class Mol_TextCifReader {
                 }
                 row++;
                 line = reader.readLine().trim();
+                //System.out.println(line);
             }
 
         } catch (Exception e) {
@@ -628,38 +623,33 @@ public class Mol_TextCifReader {
         }
     }
 
-    protected ArrayList<String> readRow(String line, int ncols) throws IOException {
+    protected ArrayList<String> getValues(String line, int ncols) throws IOException {
         ArrayList<String> values = new ArrayList<>(ncols);
-        if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-            readMultiline(values, line, ncols);
-        } else {
-            values.addAll(getValues(line));
-        }
+        getValues(values, line, ncols);
         while (values.size() != ncols) {
-            finishRead(values, ncols);
+            String line2 = reader.readLine().trim();
+            //System.out.println(line2);
+            getValues(values, line2, ncols);
         }
         return values;
     }
 
-    public void finishRead(ArrayList<String> values, int ncols) throws IOException {
-        String line2 = reader.readLine().trim();
-        if (line2.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
-            readMultiline(values, line2, ncols);
+    protected void getValues(ArrayList<String> values, String line, int ncols) throws IOException {
+        if (line.startsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
+            getMultilineValue(values, line, ncols);
         } else {
-            values.addAll(getValues(line2));
+            values.addAll(getValues(line));
         }
     }
 
-    protected void readMultiline(ArrayList<String> values, String line, int ncols)
+    protected void getMultilineValue(ArrayList<String> values, String line, int ncols)
             throws IOException {
         String line2 = reader.readLine();
+        //System.out.println(line2);
         if (line2.trim().equalsIgnoreCase(Mol_Strings.SYMBOL_SEMI_COLON)) {
             values.add(line.substring(1));
-            while (values.size() != ncols) {
-                finishRead(values, ncols);
-            }
         } else {
-            readMultiline(values, line.concat(line2), ncols);
+            getMultilineValue(values, line.concat(line2), ncols);
         }
     }
 //           while (values.size() != columns.getNCols()) {

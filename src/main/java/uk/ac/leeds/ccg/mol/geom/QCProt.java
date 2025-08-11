@@ -53,17 +53,8 @@
  */
 package uk.ac.leeds.ccg.mol.geom;
 
-import ch.obermuhlner.math.big.BigRational;
-import java.math.RoundingMode;
 import java.util.TreeSet;
-import uk.ac.leeds.ccg.math.arithmetic.Math_BigRational;
-import uk.ac.leeds.ccg.math.arithmetic.Math_Double;
 import uk.ac.leeds.ccg.mol.data.cif.CIF;
-import uk.ac.leeds.ccg.mol.data.cif.Column;
-import uk.ac.leeds.ccg.mol.data.cif.Column_ID;
-import uk.ac.leeds.ccg.mol.data.cif.Columns;
-import uk.ac.leeds.ccg.mol.data.cif.Row_ID;
-import uk.ac.leeds.ccg.mol.data.cif.Value;
 
 /**
  *

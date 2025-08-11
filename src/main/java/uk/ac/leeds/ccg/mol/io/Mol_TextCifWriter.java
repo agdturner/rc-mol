@@ -45,6 +45,7 @@ import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Poly;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Entity_Src_Gen;
 import uk.ac.leeds.ccg.mol.data.cif.columns.NDB_Struct_NA_Base_Pair_Step;
 import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Entity_NonPoly;
+import uk.ac.leeds.ccg.mol.data.cif.columns.PDBX_Struct_Conn_Angle;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Conn;
 import uk.ac.leeds.ccg.mol.data.cif.columns.Struct_Ref;
 import uk.ac.leeds.ccg.mol.data.cif.data_items.EM_Entity_Assembly;
@@ -120,9 +121,14 @@ public class Mol_TextCifWriter {
                                     cols.keySet().forEach(cid -> {
                                         Value v = cols.get(cid);
                                         Column column = columns.columns.get(cid);
-                                        int w = column.getWidth();
-                                        int sw = v.v.length();
-                                        String pad = padding.get(w - sw + 1);
+                                        int length = v.v.length();
+                                        int padLength = column.getWidth() - length + 1;
+                                        String pad;
+                                        if (padLength >= CIF.HEADER_LENGTH_MAX) {
+                                            pad = " ";
+                                        } else {
+                                            pad = padding.get(padLength);
+                                        }
                                         if (pad == null) {
                                             pad = " ";
                                         }
@@ -131,49 +137,62 @@ public class Mol_TextCifWriter {
                                         }
                                         String sbs = sb.toString();
                                         String[] sbss = sbs.split(Mol_Environment.EOL);
-                                        if (sw > CIF.HEADER_LENGTH_MAX) {
+                                        if (length > CIF.HEADER_LENGTH_MAX) {
                                             // Handle special cases:
                                             if (columns.name.equalsIgnoreCase(Entity_Name_Com.NAME)) {
-                                                if (sw + sbs.length() <= 130) {
+                                                if (length + sbs.length() <= 130) {
                                                     add_s_pad(sb, pad, v.v);
-                                                    //break;
                                                 } else {
                                                     addMultiline1(sb, v.v);
                                                 }
+                                            } else if (columns.name.equalsIgnoreCase(EM_Entity_Assembly.NAME)) {
+                                                int maxLength = 139;
+                                                if (length > 131) {
+                                                    addMultiline0(sb, maxLength, v.v);
+                                                } else {
+                                                    if (sbss[sbss.length - 1].length() + length > maxLength) {
+                                                        sb.append(Mol_Environment.EOL);
+                                                        pad = " ";
+                                                    }
+                                                    add_s_pad(sb, pad, v.v);
+                                                }
                                             } else if (columns.name.equalsIgnoreCase(Database_PDB_Caveat.NAME)) {
-                                                addMultiline1(sb, v.v);
+                                                if (sbss[sbss.length - 1].length() + length > 131) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                    add_s_pad(sb, pad, v.v);
+                                                } else {
+                                                    addMultiline1(sb, v.v);
+                                                }
                                             } else if (columns.name.equalsIgnoreCase(Entity.NAME)
-                                                    || columns.name.equalsIgnoreCase(PDBX_Entity_NonPoly.NAME)) {
-                                                if (sw > 131) {
+                                                    || columns.name.equalsIgnoreCase(PDBX_Entity_NonPoly.NAME)
+                                                    || columns.name.equalsIgnoreCase(PDBX_Struct_Assembly_Gen.NAME)) {
+                                                if (length > 131) {
                                                     addMultiline1(sb, v.v);
                                                 } else {
-                                                    if (sbss[sbss.length - 1].length() + sw > 131) {
+                                                    if (sbss[sbss.length - 1].length() + length > 131) {
                                                         sb.append(Mol_Environment.EOL);
                                                     }
                                                     add_s_pad(sb, pad, v.v);
                                                 }
-                                            } else if (columns.name.equalsIgnoreCase(Entity_Poly.NAME)) {
-
-                                                if (v.v.contains(";;")) {
-                                                    int debug = 1;
-                                                }
-
-                                                addMultiline0(sb, sw, v.v);
-                                            } else if (columns.name.equalsIgnoreCase(Struct_Ref.NAME)) {
-                                                addMultiline0(sb, sw, v.v);
-                                                sb.append(Mol_Environment.EOL);
                                             } else {
-                                                addMultiline0(sb, sw, v.v);
+                                                addMultiline0(sb, CIF.HEADER_LENGTH_MAX, v.v);
                                             }
                                         } else {
                                             // Handle special cases:
-                                            if (columns.name.equalsIgnoreCase(Entity.NAME)) {
-                                                if (sbss[sbss.length - 1].length() + sw > 131) {
+                                            if (columns.name.equalsIgnoreCase(PDBX_Struct_Conn_Angle.NAME)
+                                                    || columns.name.equalsIgnoreCase(Entity.NAME)) {
+                                                if (sbss[sbss.length - 1].length() + length > 131) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
                                                 add_s_pad(sb, pad, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(EM_Entity_Assembly.NAME)) {
+                                                if (sbss[sbss.length - 1].length() + length > 131) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                    pad = " ";
+                                                }
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Entity_Name_Com.NAME)) {
-                                                if (sw + sbs.length() > 130) {
+                                                if (length + sbs.length() > 130) {
                                                     if (sbs.endsWith(Mol_Strings.SYMBOL_SEMI_COLON)) {
                                                         sb.append(Mol_Environment.EOL);
                                                     }
@@ -187,17 +206,24 @@ public class Mol_TextCifWriter {
                                                 }
                                             } else if (columns.name.equalsIgnoreCase(Atom_Site.NAME)) {
                                                 add_s_pad(sb, pad, v.v);
-                                            } else if (columns.name.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.NAME)
-                                                    || columns.name.equalsIgnoreCase(Struct_Conn.NAME)) {
-                                                if (sbss[sbss.length - 1].length() + sw > 131) {
+                                            } else if (columns.name.equalsIgnoreCase(NDB_Struct_NA_Base_Pair_Step.NAME)) {
+                                                if (sbss[sbss.length - 1].length() + length > 131) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
                                                 if (column.name.equalsIgnoreCase("details") || column.name.equalsIgnoreCase("pdbx_dist_value")) {
                                                     pad = " ";
                                                 }
                                                 add_s_pad(sb, pad, v.v);
+                                            } else if (columns.name.equalsIgnoreCase(Struct_Conn.NAME)) {
+                                                if (column.name.equalsIgnoreCase("details") || column.name.equalsIgnoreCase("pdbx_dist_value")) {
+                                                    pad = " ";
+                                                }
+                                                if (sbss[sbss.length - 1].length() + length + pad.length() > 131) {
+                                                    sb.append(Mol_Environment.EOL);
+                                                }
+                                                add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Struct_Ref.NAME)) {
-                                                if (sw >= CIF.HEADER_LENGTH_MAX) {
+                                                if (length >= CIF.HEADER_LENGTH_MAX) {
                                                     add2(sb, v.v.concat(Mol_Environment.EOL));
                                                 } else {
                                                     add_s_pad(sb, pad, v.v);
@@ -226,7 +252,7 @@ public class Mol_TextCifWriter {
 
                                                 add_s_pad(sb, pad, v.v);
                                             } else if (columns.name.equalsIgnoreCase(Entity_Src_Gen.NAME)) {
-                                                if (sbss[sbss.length - 1].length() + sw > 131) {
+                                                if (sbss[sbss.length - 1].length() + length > 131) {
                                                     sb.append(Mol_Environment.EOL);
                                                 }
                                                 add_s_pad(sb, pad, v.v);
@@ -250,11 +276,6 @@ public class Mol_TextCifWriter {
                                     sb.append(Mol_Environment.EOL);
                                     try {
                                         //System.out.print(sb.toString());
-
-                                        if (sb.toString().contains(";;")) {
-                                            int debug = 1;
-                                        }
-
                                         bw.write(sb.toString());
                                     } catch (IOException ex1) {
                                         Logger.getLogger(Mol_TextCifReader.class.getName()).log(Level.SEVERE, null, ex1);
@@ -319,28 +340,29 @@ public class Mol_TextCifWriter {
 
     /**
      * @param sb The StringBuilder.
-     * @param sw The length of s.
+     * @param lineMaxLength The maximum length for a line. Lines greater than 
+     * this are split into multiple lines.
      * @param s The String.
      */
-    protected void addMultiline0(StringBuilder sb, int sw, String s) {
+    protected void addMultiline0(StringBuilder sb, int lineMaxLength, String s) {
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
         if (s.contains("(") && Generic_Strings.countChars(s, '(') == Generic_Strings.countChars(s, ')')) {
-            String ss = s.substring(0, CIF.HEADER_LENGTH_MAX);
+            String ss = s.substring(0, lineMaxLength);
             String sv = splitAndAppend(sb, s, ss);
-            while (sv.length() > CIF.HEADER_LENGTH_MAX) {
-                ss = sv.substring(0, CIF.HEADER_LENGTH_MAX);
+            while (sv.length() > lineMaxLength) {
+                ss = sv.substring(0, lineMaxLength);
                 sv = splitAndAppend(sb, sv, ss);
             }
             sb.append(sv);
         } else {
-            String ss = s.substring(0, CIF.HEADER_LENGTH_MAX);
-            String sv = s.substring(CIF.HEADER_LENGTH_MAX, s.length());
+            String ss = s.substring(0, lineMaxLength);
+            String sv = s.substring(lineMaxLength, s.length());
             sb.append(ss);
             sb.append(Mol_Environment.EOL);
-            while (sv.length() > CIF.HEADER_LENGTH_MAX) {
-                ss = sv.substring(0, CIF.HEADER_LENGTH_MAX);
-                sv = sv.substring(CIF.HEADER_LENGTH_MAX, sv.length());
+            while (sv.length() > lineMaxLength) {
+                ss = sv.substring(0, lineMaxLength);
+                sv = sv.substring(lineMaxLength, sv.length());
                 sb.append(ss);
                 sb.append(Mol_Environment.EOL);
             }
@@ -348,7 +370,7 @@ public class Mol_TextCifWriter {
         }
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
-
+        sb.append(Mol_Environment.EOL);
         if (sb.toString().contains(";;")) {
             int debug = 1;
         }
@@ -383,6 +405,7 @@ public class Mol_TextCifWriter {
         sb.append(s);
         sb.append(Mol_Environment.EOL);
         sb.append(Mol_Strings.SYMBOL_SEMI_COLON);
+        sb.append(Mol_Environment.EOL);
     }
 
     /**

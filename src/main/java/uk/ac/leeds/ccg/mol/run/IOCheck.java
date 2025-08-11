@@ -58,8 +58,8 @@ public class IOCheck {
 //             String pdbid = "8scb";
 //            String pdbid = "7qwq";
 //            String pdbid = "8ccs";
-            String pdbid = "4v88";
-//            String pdbid = "6fxc";
+//            String pdbid = "4v88";
+            String pdbid = "6fxc";
 
             CIF cif = reader.getCif(pdbid, dir);
             writer.write(cif, dir, pdbid, "test");
